@@ -3,6 +3,9 @@ library(shiny)
 
 # define server logic
 server <- function(input, output) {
+  
+  
+  
   output$distPlot <- renderPlot({
     # generate bins based on input$bins from ui.R
     x    <- faithful[, 2]

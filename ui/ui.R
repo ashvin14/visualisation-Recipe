@@ -6,8 +6,18 @@ library(shinydashboard)
 ui <- dashboardPage(
   # Application title
   dashboardHeader(title = "Recipe"),
-  dashboardSidebar(),
-  dashboardBody()
+  dashboardSidebar(
+    selectizeInput(inputId = "search", 
+                   label = "Recipe", 
+                   choices = recipe_dataset$title, 
+                   selected = NULL, 
+                   multiple = FALSE,
+                   onInitialize = I('function() { this.setValue(""); }',
+                   options = list(
+                     placeholder = "")))
+  ),
+  dashboardBody(),
+  skin = "green"
   
 
     # # Sidebar with a slider input for number of bins
