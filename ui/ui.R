@@ -7,29 +7,32 @@ ui <- dashboardPage(
   # Application title
   dashboardHeader(title = "Recipe"),
   dashboardSidebar(
-    selectizeInput(inputId = "search", 
+    selectizeInput(inputId = "recipe", 
                    label = "Recipe", 
-                   choices = recipe_dataset$title, 
+                   choices = recipe_dataset$title,
                    selected = NULL, 
                    multiple = FALSE,
-                   onInitialize = I('function() { this.setValue(""); }',
                    options = list(
-                     placeholder = "")))
+                     placeholder = 'Type to search ',
+                     onInitialize = I('function() { this.setValue(""); }'))),
+    
+      #inputId = "add",
+      #label = "Add to List",
+      #icon = icon("cart-plus"),
+      #width = "100%"
+    #)
+    actionButton("Add", 
+                 "Add",
+                 icon = icon("cart-plus"))
+    
   ),
-  dashboardBody(),
-  skin = "green"
   
-
-    # # Sidebar with a slider input for number of bins
-  # sidebarLayout(sidebarPanel(sliderInput(
-  #   "bins",
-  #   "Number of bins:",
-  #   min = 1,
-  #   max = 50,
-  #   value = 30
-  # )),
-  # 
-  # # Show a plot of the generated distribution
-  # mainPanel(plotOutput("distPlot")))
-  )
-
+  dashboardBody(
+    fluidPage(fluidRow(
+      column(6, )
+    ))
+  ),
+  
+  #skin = "green"
+)
+ 
