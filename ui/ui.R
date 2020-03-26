@@ -26,13 +26,7 @@ ui <- dashboardPage(
   ),
   
   dashboardBody(fluidPage(fluidRow(
-    box(
-      title = "Grocery List",
-      solidHeader = T,
-      width = 4,
-      collapsible = T,
-      div(DT::DTOutput("grocery_df"), style = "font-size: 70%;")
-    )
+    uiOutput("groceryListUI")
   ))),
   
   skin = "green"
