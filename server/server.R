@@ -2,6 +2,7 @@ library(shiny)
 source("./data/data.R")
 library(reshape2)
 source("./server/utilities.R")
+library("plotly")
 # define server logic
 server <- function(input, output) {
   values <-
@@ -34,7 +35,10 @@ server <- function(input, output) {
                 ingredients[i])
     }
     
-    print(ingredients)
+    output$constituents_bar_graph <- renderUI({
+      
+    })
+    
     output$groceryListUI <- renderUI({
       box(
         title = "Grocery List",
@@ -46,6 +50,8 @@ server <- function(input, output) {
       )
     })
   })
+  
+  
   
   
   output$grocery_df <- DT::renderDataTable(grocery_df$df,
