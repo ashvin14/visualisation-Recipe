@@ -6,6 +6,28 @@ get_ingredients <- function(molten_dataframe, recipe_title) {
 
 
 
+deleteButtonColumn <- function(df, id, ...) {
+  # function to create one action button as string
+  f <- function(i) {
+    as.character(actionButton(paste(id, i, sep="_"), label = NULL, icon = icon('trash'),
+                              onclick = 'Shiny.setInputValue(\"deletePressed\",  this.id, {priority: "event"})'))
+  }
+
+  df <- data.frame(df)
+  names(df) <- c("Ingredients", "No of Portions")
+  deleteCol <- unlist(lapply(seq_len(nrow(df)), f))
+
+  # Return a data table
+  DT::datatable(cbind(df, Delete = deleteCol),
+                # Need to disable escaping for html as string to work
+                escape = FALSE,
+                rownames = FALSE,
+                options = list(
+                  # Disable sorting for the delete column
+                  columnDefs = list(list(targets = 1, sortable = FALSE))
+                ))
+
+
 get_constituents <- function(molten_dataframe, recipe_titles) {
 
   result <- recipe_dataset[recipe_dataset$title %in% recipe_titles$Recipes,]
@@ -21,38 +43,14 @@ get_constituents <- function(molten_dataframe, recipe_titles) {
   return(consitituents)
 }
 
-deleteButtonColumn <- function(df, id, ...) {
-  # function to create one action button as string
-  f <- function(i) {
-    as.character(
-      actionButton(
-        paste(id, i, sep = "_"),
-        label = NULL,
-        icon = icon('trash'),
-        onclick = 'Shiny.setInputValue(\"deletePressed\",  this.id, {priority: "event"})'
-      )
-    )
-  }
-  
-  df <- data.frame(df)
-  names(df) <- "Ingredients"
-  deleteCol <- unlist(lapply(seq_len(nrow(df)), f))
-  
-  # Return a data table
-  DT::datatable(
-    cbind(df, Delete = deleteCol),
-    # Need to disable escaping for html as string to work
-    escape = FALSE,
-    options = list(# Disable sorting for the delete column
-      columnDefs = list(list(
-        targets = 1, sortable = FALSE
-      )))
-  )
-}
 
 
 parseDeleteEvent <- function(idstr) {
   res <- as.integer(sub(".*_([0-9]+)", "\\1", idstr))
-  if (!is.na(res))
-    res
+  if (! is.na(res)) res
 }
+
+
+
+
+
