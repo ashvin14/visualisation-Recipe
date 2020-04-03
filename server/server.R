@@ -102,10 +102,21 @@ server <- function(input, output) {
   
   
   
-  #output$grocery_df <- DT::renderDataTable(grocery_df$df,
-     #                                   # colnames = c("Quantity", "Units", "Ingredient"),
-       #                                  rownames = F)
-  output$grocery_df <-
-    DT::renderDataTable(deleteButtonColumn(grocery_df$df, 'delete_button'))
+
+  # output$grocery_df <- DT::renderDataTable(grocery_df$df,
+  #                                       # colnames = c("Quantity", "Units", "Ingredient"),
+  #                                        rownames = F)
+
   
+  output$grocery_df <- DT::renderDataTable(
+    deleteButtonColumn(grocery_df$df, 'delete_button'))
+  
+  observeEvent(input$deletePressed, {
+    rowNum <- parseDeleteEvent(input$deletePressed)
+    grocery_df$df <- data.frame(grocery_df$df, stringsAsFactors =F)
+    dataRow <- grocery_df$df[rowNum, ]
+    values$deletedRows <- rbind(dataRow, values$deletedRows)
+    values$deletedRowIndices <- append(values$deletedRowIndices, rowNum, after = 0)
+    grocery_df$df <- grocery_df$df[-(rowNum), ]
+  })
 }
