@@ -88,8 +88,7 @@ server <- function(input, output) {
     recipe_df$df
   })
   
-  output$grocery_df <-
-    DT::renderDataTable(deleteButtonColumn(grocery_df$df, 'delete_button'))
+ 
   
   observeEvent(input$deletePressed, {
     rowNum <- parseDeleteEvent(input$deletePressed)
@@ -103,8 +102,10 @@ server <- function(input, output) {
   
   
   
-  output$grocery_df <- DT::renderDataTable(grocery_df$df,
-                                           # colnames = c("Quantity", "Units", "Ingredient"),
-                                           rownames = F)
+  #output$grocery_df <- DT::renderDataTable(grocery_df$df,
+     #                                   # colnames = c("Quantity", "Units", "Ingredient"),
+       #                                  rownames = F)
+  output$grocery_df <-
+    DT::renderDataTable(deleteButtonColumn(grocery_df$df, 'delete_button'))
   
 }
