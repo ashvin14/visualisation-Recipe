@@ -7,6 +7,7 @@ ui <- dashboardPage(
   # Application title
   dashboardHeader(title = "Recipe"),
   dashboardSidebar(
+    width = 350,
     selectizeInput(
       inputId = "recipe",
       label = "Recipe",
@@ -22,11 +23,12 @@ ui <- dashboardPage(
     #              "Add",
     #              icon = icon("cart-plus"))
     uiOutput("add")
-    
   ),
   
   dashboardBody(fluidPage(fluidRow(
+    uiOutput("RecipeListUI"),
     uiOutput("groceryListUI")
+
   ))),
   
   skin = "green"
