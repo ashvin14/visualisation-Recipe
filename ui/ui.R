@@ -29,6 +29,9 @@ ui <- dashboardPage(
     uiOutput("RecipeListUI"),
     uiOutput("groceryListUI")
 
+  ),
+  fluidRow(
+    uiOutput("constituents_bar_graph")
   ))),
   
   skin = "green"
