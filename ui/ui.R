@@ -21,12 +21,17 @@ ui <- dashboardPage(
     # actionButton("Add",
     #              "Add",
     #              icon = icon("cart-plus"))
-    uiOutput("add")
-    
+    uiOutput("add"),
+    uiOutput('undoUI')
   ),
   
   dashboardBody(fluidPage(fluidRow(
+    uiOutput("RecipeListUI"),
     uiOutput("groceryListUI")
+
+  ),
+  fluidRow(
+    uiOutput("constituents_bar_graph")
   ))),
   
   skin = "green"

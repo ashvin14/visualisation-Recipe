@@ -1,8 +1,9 @@
 library(tidyverse)
 get_ingredients <- function(molten_dataframe, recipe_title) {
-  result <- molten_dataframe[molten_dataframe$title == recipe_title,]
+  result <- molten_dataframe[molten_dataframe$title == recipe_title, ]
   return(result$ingredients)
 }
+
 
 
 deleteButtonColumn <- function(df, id, ...) {
@@ -25,13 +26,30 @@ deleteButtonColumn <- function(df, id, ...) {
                   # Disable sorting for the delete column
                   columnDefs = list(list(targets = 1, sortable = FALSE))
                 ))
+
+
+get_constituents <- function(molten_dataframe, recipe_titles) {
+
+  result <- recipe_dataset[recipe_dataset$title %in% recipe_titles$Recipes,]
+  
+  consitituents <- tibble(
+    "title" = recipe_titles$Recipes,
+    "calories" = result$calories,
+    "protein" = result$protein,
+    "fat" = result$fat,
+    "sodium" = result$sodium
+  )
+  print(consitituents)
+  return(consitituents)
 }
+
 
 
 parseDeleteEvent <- function(idstr) {
   res <- as.integer(sub(".*_([0-9]+)", "\\1", idstr))
   if (! is.na(res)) res
 }
+
 
 
 
