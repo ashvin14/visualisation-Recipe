@@ -54,6 +54,21 @@ deleteButtonColumn <- function(df, id, ...) {
                 ))
 }
 
+get_constituents <- function(molten_dataframe, recipe_titles) {
+  
+  result <- recipe_dataset[recipe_dataset$title %in% recipe_titles$Recipes,]
+  
+  consitituents <- tibble(
+    "title" = recipe_titles$Recipes,
+    "calories" = result$calories,
+    "protein" = result$protein,
+    "fat" = result$fat,
+    "sodium" = result$sodium
+  )
+  print(consitituents)
+  return(consitituents)
+}
+
 
 parseDeleteEvent <- function(idstr) {
   res <- as.integer(sub(".*_([0-9]+)", "\\1", idstr))

@@ -2,6 +2,7 @@
 library(shiny)
 source("./data/data.R")
 library(reshape2)
+library(plotly)
 source("./server/utilities.R")
 # define server logic
 library(stringr)
@@ -21,7 +22,7 @@ server <- function(input, output) {
   # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
   #                             stringsAsFactors = F)
   
-  recipe_df$df <- data.frame("Recipes.." = character(),
+  recipe_df$df <- data.frame("Recipes" = character(),
                              stringsAsFactors = F )
   
   grocery_data$df <- data.frame("Ingredients" = character(),"Weight" = integer(),
@@ -75,6 +76,23 @@ server <- function(input, output) {
         #print(grocery_data$df)
         
       }
+      
+      constituents <-
+        get_constituents(recipe_data, recipe_df$df)
+      
+      
+      dat2 <- melt(constituents, id.vars = "title")
+      print(dat2)
+      
+      output$constituents_bar_graph <- renderUI({
+        box(
+          title = "plots will be here",
+          collapsible =  T,
+          width =  6,
+          plot_ly(dat2, x = ~variable, y = ~value, type = 'bar', color = dat2$title) %>% layout(barmode = 'stack')
+        )
+      })
+      
     }
     
     
