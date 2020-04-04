@@ -16,6 +16,20 @@ get_ingredients <- function(recipe_title) {
   return(ingredients)
 }
 
+get_Weight <- function(recipe_title) {
+  Weight <- list()
+  result <- recipe_data[recipe_data$title == recipe_title,]
+  print('xyz..........')
+  print(result$weight_per_ingr)
+  print('abc..........')
+  Weight_list <- strsplit(result$weight_per_ingr, ",")
+  j <- length(Weight_list[[1]])
+  for(i in 1:j){
+    Weight[i] <- as.double(Weight_list[[1]][i])
+  }
+  return(Weight)
+}
+
 
 deleteButtonColumn <- function(df, id, ...) {
   # function to create one action button as string
@@ -25,7 +39,7 @@ deleteButtonColumn <- function(df, id, ...) {
   }
   
   df <- data.frame(df)
-  names(df) <- c("Ingredients", "No of Portions")
+  names(df) <- c("Ingredients", "Weight in Grams")
   deleteCol <- unlist(lapply(seq_len(nrow(df)), f))
   
   # Return a data table
