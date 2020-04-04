@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 library(tidyverse)
 # get_ingredients <- function(molten_dataframe, recipe_title) {
 #   result <- molten_dataframe[molten_dataframe$title == recipe_title,]
@@ -58,4 +59,5 @@ parseDeleteEvent <- function(idstr) {
   res <- as.integer(sub(".*_([0-9]+)", "\\1", idstr))
   if (! is.na(res)) res
 }
+
 

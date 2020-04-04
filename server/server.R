@@ -1,3 +1,4 @@
+
 library(shiny)
 source("./data/data.R")
 library(reshape2)
@@ -116,4 +117,5 @@ server <- function(input, output) {
     grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
+
 }
