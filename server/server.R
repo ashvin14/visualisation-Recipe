@@ -1,3 +1,4 @@
+
 library(shiny)
 source("./data/data.R")
 library(reshape2)
@@ -23,7 +24,7 @@ server <- function(input, output) {
   recipe_df$df <- data.frame("Recipes.." = character(),
                              stringsAsFactors = F )
   
-  grocery_data$df <- data.frame("Recipes.." = character(),"Portion Size" = integer(),
+  grocery_data$df <- data.frame("Ingredients" = character(),"Weight" = integer(),
                              stringsAsFactors = F )
   
   observeEvent(input$recipe, {
@@ -47,20 +48,32 @@ server <- function(input, output) {
     recipe_df$df[nrow(recipe_df$df)+1,] <- input$recipe
     
     #grocery_df$df <- as.data.frame(grocery_df$df, stringsAsFactors = F)
-    grocery_data$df <- as.data.frame(grocery_data$df, "Portion Size" = integer(),
-                                     stringsAsFactors = F)
-    
+    grocery_data$df <- as.data.frame(grocery_data$df, "Weight" = integer(),
+                                    stringsAsFactors = F)
+    Weights <- as.vector(get_Weight(input$recipe))
+
     for (i in 1:length(ingredients)) {
-      
-      if(!(any(grocery_data$df$ingredient == ingredients[i]))){
+      #grocery_data$df$ingredient[i] <- grocery_data$df$ingredient[[1]][i]
+      print('xyz-------------')
+      print(grocery_data$df$Ingredients)
+      print('abc-------------')
+     # print(ingredients[[i]])
+      if(!(any(grocery_data$df$Ingredients == ingredients[i]))){
+        print('abc-------------')
         grocery_data$df[nrow(grocery_data$df) + 1,] <-
-          c(ingredients[i],1)}
+          c(ingredients[i],round(as.double(Weights[i]),2))
+        print(grocery_data$df[nrow(grocery_data$df) + 1,])
+        
+        }
+      
       else 
       { 
-        k <- grocery_data$df[grocery_data$df$ingredient == ingredients[i],] 
+        k <- grocery_data$df[grocery_data$df$Ingredients == ingredients[i],] 
         #print(k)
-        grocery_data$df$Portion.Size[grocery_data$df$ingredient == ingredients[i]] <- as.integer(k$Portion.Size) + 1
+        weight <- as.double(grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]]) + as.double(Weights[i])
+        grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]] <- round(weight,2)
         #print(grocery_data$df)
+        
       }
     }
     
@@ -104,4 +117,5 @@ server <- function(input, output) {
     grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
+
 }
