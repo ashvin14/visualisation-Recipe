@@ -1,7 +1,19 @@
 library(tidyverse)
-get_ingredients <- function(molten_dataframe, recipe_title) {
-  result <- molten_dataframe[molten_dataframe$title == recipe_title,]
-  return(result$ingredients)
+# get_ingredients <- function(molten_dataframe, recipe_title) {
+#   result <- molten_dataframe[molten_dataframe$title == recipe_title,]
+#   return(result$ingredients)
+# }
+
+get_ingredients <- function(recipe_title) {
+  ingredients <- list()
+  result <- recipe_data[recipe_data$title == recipe_title,]
+  print(result$ingredient_list)
+  ingredients_list <- strsplit(result$ingredient_list, ",")
+  n <- length(ingredients_list[[1]])
+  for(i in 1:n){
+    ingredients[i] <- ingredients_list[[1]][i]
+  }
+  return(ingredients)
 }
 
 
