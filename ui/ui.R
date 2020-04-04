@@ -10,7 +10,7 @@ ui <- dashboardPage(
     selectizeInput(
       inputId = "recipe",
       label = "Recipe",
-      choices = recipe_dataset$title,
+      choices = recipe_data$title,
       selected = NULL,
       multiple = FALSE,
       options = list(

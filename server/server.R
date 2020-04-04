@@ -3,6 +3,7 @@ source("./data/data.R")
 library(reshape2)
 source("./server/utilities.R")
 # define server logic
+library(stringr)
 
 server <- function(input, output) {
   values <-
@@ -13,11 +14,16 @@ server <- function(input, output) {
   
   recipe_df <- shiny::reactiveValues()
   
+  grocery_data <- shiny::reactiveValues()
+  
   # change this
-  grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
-                              stringsAsFactors = F)
+  # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
+  #                             stringsAsFactors = F)
   
   recipe_df$df <- data.frame("Recipes.." = character(),
+                             stringsAsFactors = F )
+  
+  grocery_data$df <- data.frame("Recipes.." = character(),"Portion Size" = integer(),
                              stringsAsFactors = F )
   
   observeEvent(input$recipe, {
@@ -34,21 +40,27 @@ server <- function(input, output) {
     values$deletedRowIndices = list()
   })
   observeEvent(input$Add, {
+    
     ingredients <-
-      as.vector(get_ingredients(molten_filtered_recipe_dataset2, input$recipe))
+      as.vector(get_ingredients(input$recipe))
+    
     recipe_df$df[nrow(recipe_df$df)+1,] <- input$recipe
     
-    grocery_df$df <- as.data.frame(grocery_df$df, stringsAsFactors = F)
+    #grocery_df$df <- as.data.frame(grocery_df$df, stringsAsFactors = F)
+    grocery_data$df <- as.data.frame(grocery_data$df, "Portion Size" = integer(),
+                                     stringsAsFactors = F)
+    
     for (i in 1:length(ingredients)) {
-      if(!(any(grocery_df$df$ingredient == ingredients[i]))){
-        grocery_df$df[nrow(grocery_df$df) + 1,] <-
+      
+      if(!(any(grocery_data$df$ingredient == ingredients[i]))){
+        grocery_data$df[nrow(grocery_data$df) + 1,] <-
           c(ingredients[i],1)}
       else 
       { 
-        k <- grocery_df$df[grocery_df$df$ingredient == ingredients[i],] 
-        print(k)
-        grocery_df$df$Portion.Size[grocery_df$df$ingredient == ingredients[i]] <- as.integer(k$Portion.Size) + 1
-        print(grocery_df$df)
+        k <- grocery_data$df[grocery_data$df$ingredient == ingredients[i],] 
+        #print(k)
+        grocery_data$df$Portion.Size[grocery_data$df$ingredient == ingredients[i]] <- as.integer(k$Portion.Size) + 1
+        #print(grocery_data$df)
       }
     }
     
@@ -60,7 +72,7 @@ server <- function(input, output) {
         width = 6,
         collapsible = T,
         h5(input$recipe),
-        div(DT::DTOutput("grocery_df"), style = "font-size: 70%;")
+        div(DT::DTOutput("grocery_data"), style = "font-size: 70%;")
       )
     })
     
@@ -80,16 +92,16 @@ server <- function(input, output) {
     recipe_df$df},rownames = FALSE
   )
   
-  output$grocery_df <- DT::renderDataTable(
-    deleteButtonColumn(grocery_df$df, 'delete_button'))
+  output$grocery_data <- DT::renderDataTable(
+    deleteButtonColumn(grocery_data$df, 'delete_button'))
   
   observeEvent(input$deletePressed, {
     rowNum <- parseDeleteEvent(input$deletePressed)
-    grocery_df$df <- data.frame(grocery_df$df, stringsAsFactors =F)
-    dataRow <- grocery_df$df[rowNum, ]
+    grocery_data$df <- data.frame(grocery_data$df, stringsAsFactors =F)
+    dataRow <- grocery_data$df[rowNum, ]
     values$deletedRows <- rbind(dataRow, values$deletedRows)
     values$deletedRowIndices <- append(values$deletedRowIndices, rowNum, after = 0)
-    grocery_df$df <- grocery_df$df[-(rowNum), ]
+    grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
 }
