@@ -34,6 +34,60 @@ ingredients <- str_remove_all(ingredients, pattern)
 recipe_data$ingredient_list<- noquote(ingredients)
 
 
+## Nutrition table
+
+pattern="\\[\\{"
+
+nutrition<-str_remove_all(recipe_data$nutr_per_ingr,pattern)
+
+pattern='\\}'
+
+nutrition<-str_remove_all(nutrition,pattern)
+
+pattern='\\{'
+
+nutrition<-str_remove_all(nutrition,pattern)
+
+pattern='\\]'
+
+nutrition<-str_remove_all(nutrition,pattern)
+
+recipe_data$nutr_per_ingr<-noquote(nutrition)
+nutritiontable<-data.frame(fat=rep(0,1),nrg=rep(0,1),pro=rep(0,1),sat=rep(0,1),sod=rep(0,1),sug=rep(0,1),fat=rep(0,1))
+
+for (i in (1:length(recipe_data$nutr_per_ingr)))
+{
+  new<-strsplit(recipe_data$nutr_per_ingr[i],',')
+  new<-new[[1]]
+  new<-noquote(new)
+  df<-data.frame(new)
+  df<-df%>%separate(new,c('content','value'),sep=':')
+  df[,1]<-(gsub("'",'',df[,1]))
+  df[,2]<-as.numeric(df[,2])
+  df<-df%>%group_by(content)%>%summarize(value=sum(value))
+  df<-pivot_wider(df,names_from = content,values_from = value)
+  df<-df%>%rename('fat.1'='fat')
+  nutritiontable[nrow(nutritiontable)+1,1:7]<-df
+}
+
+options(scipen=999)
+nutritiontable<-nutritiontable[-c(1),]
+nutritiontable<-round(nutritiontable,2)
+rownames(nutritiontable)<-NULL
+recipe_data<-cbind(recipe_data,nutritiontable)
+recipe_data<-recipe_data[,c(-7,-17)]
+recipe_data<-recipe_data%>%rename('Fat'='fat','Energy'='nrg','Protein'='pro','Saturated fat'='sat','Sodium'='sod','Sugar'='sug')
+recipe_data
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -50,3 +104,5 @@ recipe_data$ingredient_list<- noquote(ingredients)
 # 
 # image_annotate(scroll, text_directions, size = 15, color = "green",
 #                location = "+20+100")
+
+

@@ -22,17 +22,38 @@ ui <- dashboardPage(
     #              "Add",
     #              icon = icon("cart-plus"))
     uiOutput("add"),
-    uiOutput('undoUI')
+    uiOutput('undoUI'),
+    uiOutput('quantity')
   ),
-  
-  dashboardBody(fluidPage(fluidRow(
-    uiOutput("RecipeListUI"),
-    uiOutput("groceryListUI")
+  dashboardBody(tags$head(tags$style(HTML(
+    '{margin:5px;}'
+  ))),
+  fluidRow(width =5,(valueBoxOutput(
+    'calories'
+  )),
+  (valueBoxOutput(
+    'Protein'
+  ))
 
   ),
+  fluidPage(fluidRow(
+    uiOutput("RecipeListUI"),
+    uiOutput("groceryListUI")
+    
+  )),
+  conditionalPanel(condition = 'input.Add==1',
+  fluidRow(column(width=5,style='padding-top:100px',box(
+    title='Nutrition Table',
+    solidHeader = T,
+    collapsible = T,
+    width=NULL,
+    div(DT::DTOutput('table2'))
+  )))),
+  
+  
   fluidRow(
     uiOutput("constituents_bar_graph")
-  ))),
+  )),
   
   skin = "green"
 )
