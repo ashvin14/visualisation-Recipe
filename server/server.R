@@ -15,7 +15,6 @@ server <- function(input, output) {
   
   grocery_data <- shiny::reactiveValues()
   
-  nutritiontab<-shiny::reactiveValues()
   
   # change this
   # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
@@ -27,7 +26,7 @@ server <- function(input, output) {
   grocery_data$df <- data.frame("Ingredients" = character(),"Weight" = integer(),
                              stringsAsFactors = F )
   
-  nutritiontab$df<- data.frame('Nutrition'=character(),'Value'=integer())
+
   
   observeEvent(input$recipe, {
     
@@ -124,22 +123,28 @@ server <- function(input, output) {
     
   })
   
-  observeEvent({input$Add
-    input$number},{ 
-      values$number<-input$number
-      values$col1<-nutri_table(recipe_data,input$recipe,values$number)
-  
-  output$table2<-DT::renderDT({
-    shiny::validate(need(values$col1,''))
-    isolate(values$col1)
-  })
+  df<-data.frame('Nutrition Name'=character(),'Value'=integer())
+  observeEvent(input$Add,{
+  values$number<-input$number  
+  for (i in recipe_df$df$Recipes..){
+      de<-nutri_table(recipe_data,i,values$number)
+      df<-rbind(df,de)
+    }
+    output$table2<-DT::renderDataTable({
+    shiny::validate(need(df,''))
+    df<-df%>%group_by(Nutrition.Name)%>%summarize(Value=sum(Value))
+    u<-c('KJ(cal)','gram','gram','gram','mg','gram')
+    values$col1<-data.frame(df,units=u)
+    values$col1
     })
+  })
+
   
   output$calories<-renderValueBox ({
     validate(need(values$col1,'')) 
-    df<-values$col1%>%filter(`Nutrition Name` =='Energy')%>%select(Value)
-    if (nrow(df)>0){
-      valueBox(paste0(df$Value,'Kcal'),'Energy',icon=icon('fire'),color = 'orange',width=NULL)
+    dat<-values$col1%>%filter(Nutrition.Name=='Energy')%>%select(Value)
+    if (nrow(dat)>0){
+      valueBox(paste0(dat$Value,'Kcal'),'Energy',icon=icon('fire'),color = 'orange',width=NULL)
     }
     
     else{
@@ -149,7 +154,7 @@ server <- function(input, output) {
   })
   output$Protein<-renderValueBox({
     validate(need(values$col1,'')) 
-    df1<-values$col1%>%filter(`Nutrition Name` =='Protein')%>%select(Value)
+    df1<-values$col1%>%filter(Nutrition.Name =='Protein')%>%select(Value)
     if (nrow(df1)>0){
       valueBox(paste0(df1$Value,'Grams'),'Protein',icon=icon('child'),color = 'green',width=NULL)
     }
@@ -157,5 +162,5 @@ server <- function(input, output) {
       valueBox('Add Recipe','Protein',icon=icon('child'),color='green',width=NULL)  
     }
   })
-  
+   
 }

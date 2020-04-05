@@ -4,19 +4,6 @@ library(tidyverse)
 #   return(result$ingredients)
 # }
 
-nutri_table <- function(df,t,number) {
-  new<-df%>%filter(title==c(t))%>%select(Fat,Energy,Protein,`Saturated fat`,Sodium,Sugar)
-  u<-c('gram','KJ(cal)','gram','gram','mg','gram')
-  tran<-pivot_longer(new,cols=c(1:6),names_to ='Nutrition Name',values_to='Value')
-  trans<-as.data.frame(tran,unit=u)
-  if ((!is.null(number) & number!=0)){
-    trans[,2]<-trans[,2]*(number)
-  } else if (number==0){
-    trans<-NULL
-  }
-  return (trans)
-}
-
 
 get_ingredients <- function(recipe_title) {
   ingredients <- list()
@@ -71,6 +58,18 @@ deleteButtonColumn <- function(df, id, ...) {
 parseDeleteEvent <- function(idstr) {
   res <- as.integer(sub(".*_([0-9]+)", "\\1", idstr))
   if (! is.na(res)) res
+}
+
+nutri_table <- function(df,t,number) {
+  new<-df%>%filter(title==c(t))%>%select(Fat,Energy,Protein,`Saturated fat`,Sodium,Sugar)
+  tran<-pivot_longer(new,cols=c(1:6),names_to = c('Nutrition.Name'),values_to='Value')
+  trans<-as.data.frame(tran)
+  if ((!is.null(number) & number!=0)){
+    trans[,2]<-trans[,2]*(number)
+  } else if (number==0){
+    trans<-NULL
+  }
+  return (trans)
 }
 
 
