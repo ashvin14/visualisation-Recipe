@@ -1,6 +1,7 @@
 library(shiny)
 source("./data/data.R")
 library(reshape2)
+source('./server/utilities.R')
 # define server logic
 library(stringr)
 
@@ -123,7 +124,8 @@ server <- function(input, output) {
     
   })
   
-  df<-data.frame('Nutrition Name'=character(),'Value'=integer())
+  df<-data.frame('Nutrition.Name'=character(),'Value'=integer())
+  
   observeEvent(input$Add,{
   values$number<-input$number  
   for (i in recipe_df$df$Recipes..){
