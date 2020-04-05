@@ -36,6 +36,37 @@ ingredients <- str_remove_all(ingredients, pattern)
 recipe_data$ingredient_list<- noquote(ingredients)
 
 
+
+pattern = "\\[\\{'text': "
+Quantity <- str_remove(recipe_data$quantity, pattern)
+
+pattern = "\\{'text'"
+Quantity <- str_remove_all(Quantity, pattern)
+
+pattern = ": "
+Quantity <- str_remove_all(Quantity, pattern)
+
+pattern = "\\}"
+Quantity <- str_remove_all(Quantity, pattern)
+
+pattern = "\\]"
+Quantity <- str_remove_all(Quantity, pattern)
+
+pattern = "'"
+Quantity <- str_remove_all(Quantity, pattern)
+
+recipe_data$quantity<- noquote(Quantity)
+
+
+pattern = "\\["
+Weight <- str_remove(recipe_data$weight_per_ingr, pattern)
+pattern = "\\]"
+Weight <- str_remove_all(Weight, pattern)
+
+recipe_data$weight_per_ingr<- noquote(Weight)
+
+
+
 ## Nutrition table
 pattern="\\[\\{"
 
@@ -71,50 +102,16 @@ for (i in (1:length(recipe_data$nutr_per_ingr)))
   nutritiontable[nrow(nutritiontable)+1,1:7]<-df
 }
 
+
+
 options(scipen=999)
 nutritiontable<-nutritiontable[-c(1),]
 nutritiontable<-round(nutritiontable,2)
 rownames(nutritiontable)<-NULL
 recipe_data<-cbind(recipe_data,nutritiontable)
-recipe_data<-recipe_data[,c(-7,-17)]
+recipe_data<-recipe_data[,c(-7,-18)]
 recipe_data<-recipe_data%>%rename('Fat'='fat','Energy'='nrg','Protein'='pro','Saturated fat'='sat','Sodium'='sod','Sugar'='sug')
 recipe_data
-
-
-
-
-
-pattern = "\\[\\{'text': "
-Quantity <- str_remove(recipe_data$quantity, pattern)
-
-pattern = "\\{'text'"
-Quantity <- str_remove_all(Quantity, pattern)
-
-pattern = ": "
-Quantity <- str_remove_all(Quantity, pattern)
-
-pattern = "\\}"
-Quantity <- str_remove_all(Quantity, pattern)
-
-pattern = "\\]"
-Quantity <- str_remove_all(Quantity, pattern)
-
-pattern = "'"
-Quantity <- str_remove_all(Quantity, pattern)
-
-recipe_data$quantity<- noquote(Quantity)
-
-
-pattern = "\\["
-Weight <- str_remove(recipe_data$weight_per_ingr, pattern)
-pattern = "\\]"
-Weight <- str_remove_all(Weight, pattern)
-
-recipe_data$weight_per_ingr<- noquote(Weight)
-
-
-
-
 
 
 
