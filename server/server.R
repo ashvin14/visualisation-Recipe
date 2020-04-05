@@ -81,21 +81,7 @@ server <- function(input, output) {
         
       }
       
-      constituents <-
-        get_constituents(recipe_data, recipe_df$df)
       
-      
-      dat2 <- melt(constituents, id.vars = "title")
-      print(dat2)
-      
-      output$constituents_bar_graph <- renderUI({
-        box(
-          title = "plots will be here",
-          collapsible =  T,
-          width =  6,
-          plot_ly(dat2, x = ~variable, y = ~value, type = 'bar', color = dat2$title) %>% layout(barmode = 'stack')
-        )
-      })
       
     }
     
@@ -150,7 +136,7 @@ server <- function(input, output) {
   
   observeEvent(input$Add,{
   values$number<-input$number  
-  for (i in recipe_df$df$Recipes..){
+  for (i in recipe_df$df$Recipes){
       de<-nutri_table(recipe_data,i,values$number)
       df<-rbind(df,de)
     }
