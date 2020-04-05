@@ -18,6 +18,8 @@ server <- function(input, output) {
   
   grocery_data <- shiny::reactiveValues()
   
+  nutritiontab<-shiny::reactiveValues()
+  
   # change this
   # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
   #                             stringsAsFactors = F)
@@ -27,6 +29,8 @@ server <- function(input, output) {
   
   grocery_data$df <- data.frame("Ingredients" = character(),"Weight" = integer(),
                              stringsAsFactors = F )
+  
+  nutritiontab$df<- data.frame('Nutrition'=character(),'Value'=integer())
   
   observeEvent(input$recipe, {
     
@@ -136,4 +140,50 @@ server <- function(input, output) {
   })
   
 
+
+  output$quantity<-renderUI({numericInput('number',
+                                          'Enter the number of servings',value=1,min=0,max=100,step=1)
+    
+  })
+  
+  
+  value2<-reactive({
+    values$number<-input$number
+    nutrition(recipe_data,input$recipe,values$number)
+  })
+  
+  observeEvent({input$Add
+    input$number},{ 
+      values$col1<-value2()
+  
+  output$table2<-DT::renderDT({
+    shiny::validate(need(values$col1,''))
+    isolate(values$col1)
+  })
+    })
+  
+  output$calories<-renderValueBox ({
+    validate(need(values$col1,'')) 
+    df<-values$col1%>%filter(`Nutrition Name` =='Energy')%>%select(Value)
+    if (nrow(df)>0){
+      valueBox(paste0(df$Value,'Kcal'),'Energy',icon=icon('fire'),color = 'orange',width=NULL)
+    }
+    
+    else{
+      valueBox('Add Recipe','Energy',icon=icon('fire'),color='orange',width=NULL)
+    }
+    
+  })
+  output$Protein<-renderValueBox({
+    validate(need(values$col1,'')) 
+    df1<-values$col1%>%filter(`Nutrition Name` =='Protein')%>%select(Value)
+    if (nrow(df1)>0){
+      valueBox(paste0(df1$Value,'Grams'),'Protein',icon=icon('child'),color = 'green',width=NULL)
+    }
+    else{
+      valueBox('Add Recipe','Protein',icon=icon('child'),color='green',width=NULL)  
+    }
+  })
+  
 }
+
