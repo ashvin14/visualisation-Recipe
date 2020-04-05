@@ -1,7 +1,6 @@
 library(shiny)
 source("./data/data.R")
 library(reshape2)
-source("./server/utilities.R")
 # define server logic
 library(stringr)
 
@@ -125,15 +124,10 @@ server <- function(input, output) {
     
   })
   
-  
-  value2<-reactive({
-    values$number<-input$number
-    nutrition(recipe_data,input$recipe,values$number)
-  })
-  
   observeEvent({input$Add
     input$number},{ 
-      values$col1<-value2()
+      values$number<-input$number
+      values$col1<-nutri_table(recipe_data,input$recipe,values$number)
   
   output$table2<-DT::renderDT({
     shiny::validate(need(values$col1,''))

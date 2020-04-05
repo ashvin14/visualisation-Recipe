@@ -28,6 +28,7 @@ ui <- dashboardPage(
   dashboardBody(tags$head(tags$style(HTML(
     '{margin:5px;}'
   ))),
+  conditionalPanel(condition = 'input.Add==1',
   fluidRow(width =5,(valueBoxOutput(
     'calories'
   )),
@@ -35,7 +36,7 @@ ui <- dashboardPage(
     'Protein'
   ))
 
-  ),
+  )),
   fluidPage(fluidRow(
     uiOutput("RecipeListUI"),
     uiOutput("groceryListUI")
