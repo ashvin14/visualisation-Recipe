@@ -1,12 +1,28 @@
 library(shiny)
 library(shinydashboard)
 source("./data/data.R")
+library(dashboardthemes)
 
 # define UI logic
 ui <- dashboardPage(
   # Application title
-  dashboardHeader(title = "Recipe"),
+  dashboardHeader(title = shinyDashboardLogo(
+    theme = "blue_gradient")),
   dashboardSidebar(
+    width = 400,
+    tags$head(
+      tags$style(HTML("
+
+      .selectize-input {
+        height: 600px;
+        width: 300px;
+        font-size: 13pt;
+        padding-top: 5px;
+      }
+
+    "))
+    ),
+    
     selectizeInput(
       inputId = "recipe",
       label = "Recipe",
@@ -26,7 +42,8 @@ ui <- dashboardPage(
     uiOutput('undoUI')
     
   ),
-  dashboardBody(tags$head(tags$style(HTML(
+  dashboardBody(shinyDashboardThemes(
+    theme = "purple_gradient"),tags$head(tags$style(HTML(
     '{margin:5px;}'
   ))),
   fluidRow(width =5,(valueBoxOutput(
@@ -49,7 +66,10 @@ ui <- dashboardPage(
     collapsible = T,
     width=NULL,
     div(DT::DTOutput('table2'))
+<<<<<<< Updated upstream
   ))))),
+=======
+  )))))
+>>>>>>> Stashed changes
   
-  skin = "green"
 )
