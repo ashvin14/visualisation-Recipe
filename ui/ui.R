@@ -26,30 +26,31 @@ ui <- dashboardPage(
     uiOutput('undoUI')
     
   ),
-  dashboardBody(tags$head(tags$style(HTML(
-    '{margin:5px;}'
-  ))),
-  fluidRow(width =5,(valueBoxOutput(
-    'calories'
-  )),
-  (valueBoxOutput(
-    'Protein'
-  ))
-
+  dashboardBody(
+    tags$head(tags$style(HTML('{margin:5px;}'))),
+    fluidRow(width = 5, (valueBoxOutput('calories')),
+             (valueBoxOutput('Protein'))),
+    fluidPage(fluidRow(
+      uiOutput("RecipeListUI"),
+      uiOutput("groceryListUI")
+      
+    ), fluidRow(uiOutput("instructionUI")),
+    fluidRow(uiOutput("instructionSteps"))),
+    conditionalPanel(condition = 'input.table2.length >0',
+                     fluidRow(
+                       column(
+                         width = 5,
+                         style = 'padding-top:100px',
+                         box(
+                           title = 'Nutrition Table',
+                           solidHeader = T,
+                           collapsible = T,
+                           width = NULL,
+                           div(DT::DTOutput('table2'))
+                         )
+                       )
+                     ))
   ),
-  fluidPage(fluidRow(
-    uiOutput("RecipeListUI"),
-    uiOutput("groceryListUI")
-    
-  )),
-  conditionalPanel(condition = 'input.table2.length >0',
-  fluidRow(column(width=5,style='padding-top:100px',box(
-    title='Nutrition Table',
-    solidHeader = T,
-    collapsible = T,
-    width=NULL,
-    div(DT::DTOutput('table2'))
-  ))))),
   
   skin = "green"
 )

@@ -1,4 +1,8 @@
 
+
+
+
+
 library(shiny)
 source("./data/data.R")
 library(reshape2)
@@ -25,15 +29,18 @@ server <- function(input, output) {
   #                             stringsAsFactors = F)
   
   recipe_df$df <- data.frame("Recipes" = character(),
-                             stringsAsFactors = F )
+                             stringsAsFactors = F)
   
-  grocery_data$df <- data.frame("Ingredients" = character(),"Weight" = integer(),
-                             stringsAsFactors = F )
+  grocery_data$df <-
+    data.frame(
+      "Ingredients" = character(),
+      "Weight" = integer(),
+      stringsAsFactors = F
+    )
   
-
+  
   
   observeEvent(input$recipe, {
-    
     output$add <- renderUI({
       actionButton(
         inputId = "Add",
@@ -46,37 +53,41 @@ server <- function(input, output) {
     values$deletedRowIndices = list()
   })
   observeEvent(input$Add, {
-    
     ingredients <-
       as.vector(get_ingredients(input$recipe))
     
-    recipe_df$df[nrow(recipe_df$df)+1,] <- input$recipe
+    recipe_df$df[nrow(recipe_df$df) + 1,] <- input$recipe
     
     #grocery_df$df <- as.data.frame(grocery_df$df, stringsAsFactors = F)
-    grocery_data$df <- as.data.frame(grocery_data$df, "Weight" = integer(),
-                                    stringsAsFactors = F)
+    grocery_data$df <-
+      as.data.frame(grocery_data$df,
+                    "Weight" = integer(),
+                    stringsAsFactors = F)
     Weights <- as.vector(get_Weight(input$recipe))
-
+    
     for (i in 1:length(ingredients)) {
       #grocery_data$df$ingredient[i] <- grocery_data$df$ingredient[[1]][i]
       print('xyz-------------')
       print(grocery_data$df$Ingredients)
       print('abc-------------')
-     # print(ingredients[[i]])
-      if(!(any(grocery_data$df$Ingredients == ingredients[i]))){
+      # print(ingredients[[i]])
+      if (!(any(grocery_data$df$Ingredients == ingredients[i]))) {
         print('abc-------------')
         grocery_data$df[nrow(grocery_data$df) + 1,] <-
-          c(ingredients[i],round(as.double(Weights[i]),2))
+          c(ingredients[i], round(as.double(Weights[i]), 2))
         print(grocery_data$df[nrow(grocery_data$df) + 1,])
         
-        }
+      }
       
-      else 
-      { 
-        k <- grocery_data$df[grocery_data$df$Ingredients == ingredients[i],] 
+      else
+      {
+        k <-
+          grocery_data$df[grocery_data$df$Ingredients == ingredients[i],]
         #print(k)
-        weight <- as.double(grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]]) + as.double(Weights[i])
-        grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]] <- round(weight,2)
+        weight <-
+          as.double(grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]]) + as.double(Weights[i])
+        grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]] <-
+          round(weight, 2)
         #print(grocery_data$df)
         
       }
@@ -107,71 +118,136 @@ server <- function(input, output) {
       )
     })
     
+    output$instructionUI <- renderUI({
+      selectInput("InstructionRecipe",
+                  label = "Instructions",
+                  choices = recipe_df$df$Recipes)
+    })
+    
+    #box(recipe_df$df$Recipes[i],cola)
+    
+    
   })
   
-  output$recipe_df <- DT::renderDataTable({
-    recipe_df$df},rownames = FALSE
-  )
+  observeEvent(input$InstructionRecipe, {
+    instructions <- get_instructions(recipe_df$df)
+    output$instructionSteps <- renderUI({
+      for (instructions in instructions[input$InstructionRecipe]) {
+        return(lapply(1:length(instructions), function(i) {
+          box(
+            title = paste("Step ", i),
+            width = NULL,
+            solidHeader = TRUE,
+            status = "warning",
+            renderText(instructions[i])
+          )
+        }))
+        
+      }
+    })
+  })
   
-  output$grocery_data <- DT::renderDataTable(
-    deleteButtonColumn(grocery_data$df, 'delete_button'))
+  
+  
+  output$recipe_df <- DT::renderDataTable({
+    recipe_df$df
+  }, rownames = FALSE)
+  
+  output$grocery_data <-
+    DT::renderDataTable(deleteButtonColumn(grocery_data$df, 'delete_button'))
   
   observeEvent(input$deletePressed, {
     rowNum <- parseDeleteEvent(input$deletePressed)
-    grocery_data$df <- data.frame(grocery_data$df, stringsAsFactors =F)
+    grocery_data$df <-
+      data.frame(grocery_data$df, stringsAsFactors = F)
     dataRow <- grocery_data$df[rowNum, ]
     values$deletedRows <- rbind(dataRow, values$deletedRows)
-    values$deletedRowIndices <- append(values$deletedRowIndices, rowNum, after = 0)
+    values$deletedRowIndices <-
+      append(values$deletedRowIndices, rowNum, after = 0)
     grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
-
-
-  output$quantity<-renderUI({numericInput('number',
-                                          'Enter the number of servings',value=1,min=0,max=100,step=1)
+  
+  
+  output$quantity <- renderUI({
+    numericInput(
+      'number',
+      'Enter the number of servings',
+      value = 1,
+      min = 0,
+      max = 100,
+      step = 1
+    )
     
   })
   
-  df<-data.frame('Nutrition.Name'=character(),'Value'=integer())
+  df <-
+    data.frame('Nutrition.Name' = character(), 'Value' = integer())
   
-  observeEvent(input$Add,{
-  values$number<-input$number  
-  for (i in recipe_df$df$Recipes){
-      de<-nutri_table(recipe_data,i,values$number)
-      df<-rbind(df,de)
+  observeEvent(input$Add, {
+    values$number <- input$number
+    for (i in recipe_df$df$Recipes) {
+      de <- nutri_table(recipe_data, i, values$number)
+      df <- rbind(df, de)
     }
-    output$table2<-DT::renderDataTable({
-    shiny::validate(need(df,''))
-    df<-df%>%group_by(Nutrition.Name)%>%summarize(Value=sum(Value))
-    u<-c('KJ(cal)','gram','gram','gram','mg','gram')
-    values$col1<-data.frame(df,units=u)
-    values$col1
+    output$table2 <- DT::renderDataTable({
+      shiny::validate(need(df, ''))
+      df <-
+        df %>% group_by(Nutrition.Name) %>% summarize(Value = sum(Value))
+      u <- c('KJ(cal)', 'gram', 'gram', 'gram', 'mg', 'gram')
+      values$col1 <- data.frame(df, units = u)
+      values$col1
     })
   })
-
   
-  output$calories<-renderValueBox ({
-    validate(need(values$col1,'')) 
-    dat<-values$col1%>%filter(Nutrition.Name=='Energy')%>%select(Value)
-    if (nrow(dat)>0){
-      valueBox(paste0(dat$Value,'Kcal'),'Energy',icon=icon('fire'),color = 'orange',width=NULL)
+  
+  output$calories <- renderValueBox ({
+    validate(need(values$col1, ''))
+    dat <-
+      values$col1 %>% filter(Nutrition.Name == 'Energy') %>% select(Value)
+    if (nrow(dat) > 0) {
+      valueBox(
+        paste0(dat$Value, 'Kcal'),
+        'Energy',
+        icon = icon('fire'),
+        color = 'orange',
+        width = NULL
+      )
     }
     
     else{
-      valueBox('Add Recipe','Energy',icon=icon('fire'),color='orange',width=NULL)
+      valueBox(
+        'Add Recipe',
+        'Energy',
+        icon = icon('fire'),
+        color = 'orange',
+        width = NULL
+      )
     }
     
   })
-  output$Protein<-renderValueBox({
-    validate(need(values$col1,'')) 
-    df1<-values$col1%>%filter(Nutrition.Name =='Protein')%>%select(Value)
-    if (nrow(df1)>0){
-      valueBox(paste0(df1$Value,'Grams'),'Protein',icon=icon('child'),color = 'green',width=NULL)
+  output$Protein <- renderValueBox({
+    validate(need(values$col1, ''))
+    df1 <-
+      values$col1 %>% filter(Nutrition.Name == 'Protein') %>% select(Value)
+    if (nrow(df1) > 0) {
+      valueBox(
+        paste0(df1$Value, 'Grams'),
+        'Protein',
+        icon = icon('child'),
+        color = 'green',
+        width = NULL
+      )
     }
     else{
-      valueBox('Add Recipe','Protein',icon=icon('child'),color='green',width=NULL)  
+      valueBox(
+        'Add Recipe',
+        'Protein',
+        icon = icon('child'),
+        color = 'green',
+        width = NULL
+      )
     }
   })
-   
+  
 }
-
