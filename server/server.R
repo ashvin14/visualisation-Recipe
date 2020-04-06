@@ -3,13 +3,12 @@ library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
 library(reshape2)
-#<<<<<<< HEAD
-#=======
+
 
 source('./server/utilities.R')
 
 # define server logic
-#>>>>>>> d7199763daa9d1646d32b12d69438164077191ad
+
 library(stringr)
 
 

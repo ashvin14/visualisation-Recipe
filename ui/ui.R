@@ -66,10 +66,7 @@ ui <- dashboardPage(
     collapsible = T,
     width=NULL,
     div(DT::DTOutput('table2'))
-<<<<<<< Updated upstream
+
   ))))),
-=======
-  )))))
->>>>>>> Stashed changes
-  
+
 )
