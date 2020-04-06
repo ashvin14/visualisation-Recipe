@@ -1,9 +1,10 @@
 library(shiny)
+source('./server/utilities.R')
 source("./data/data.R")
 library(reshape2)
-source('./server/utilities.R')
-# define server logic
 library(stringr)
+
+
 
 server <- function(input, output) {
   values <-

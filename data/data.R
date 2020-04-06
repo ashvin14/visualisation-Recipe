@@ -84,7 +84,8 @@ pattern='\\]'
 nutrition<-str_remove_all(nutrition,pattern)
 
 recipe_data$nutr_per_ingr<-noquote(nutrition)
-nutritiontable<-data.frame(fat=rep(0,1),nrg=rep(0,1),pro=rep(0,1),sat=rep(0,1),sod=rep(0,1),sug=rep(0,1),fat=rep(0,1))
+
+nutritiontable<-data.frame('fat'=integer(),'nrg'=integer(),'pro'=integer(),'sat'=integer(),'sod'=integer(),'sug'=integer(),'fat'=integer())
 
 for (i in (1:length(recipe_data$nutr_per_ingr)))
 {
@@ -104,7 +105,6 @@ for (i in (1:length(recipe_data$nutr_per_ingr)))
 
 
 options(scipen=999)
-nutritiontable<-nutritiontable[-c(1),]
 nutritiontable<-round(nutritiontable,2)
 rownames(nutritiontable)<-NULL
 recipe_data<-cbind(recipe_data,nutritiontable)
