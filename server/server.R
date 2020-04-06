@@ -1,7 +1,15 @@
+
 library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
 library(reshape2)
+<<<<<<< HEAD
+=======
+
+source('./server/utilities.R')
+
+# define server logic
+>>>>>>> d7199763daa9d1646d32b12d69438164077191ad
 library(stringr)
 
 
@@ -22,7 +30,7 @@ server <- function(input, output) {
   # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
   #                             stringsAsFactors = F)
   
-  recipe_df$df <- data.frame("Recipes.." = character(),
+  recipe_df$df <- data.frame("Recipes" = character(),
                              stringsAsFactors = F )
   
   grocery_data$df <- data.frame("Ingredients" = character(),"Weight" = integer(),
@@ -78,6 +86,9 @@ server <- function(input, output) {
         #print(grocery_data$df)
         
       }
+      
+      
+      
     }
     
     
@@ -120,6 +131,8 @@ server <- function(input, output) {
     grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
+
+
   output$quantity<-renderUI({numericInput('number',
                                           'Enter the number of servings',value=1,min=0,max=100,step=1)
     
@@ -129,7 +142,7 @@ server <- function(input, output) {
   
   observeEvent(input$Add,{
   values$number<-input$number  
-  for (i in recipe_df$df$Recipes..){
+  for (i in recipe_df$df$Recipes){
       de<-nutri_table(recipe_data,i,values$number)
       df<-rbind(df,de)
     }
@@ -167,3 +180,4 @@ server <- function(input, output) {
   })
    
 }
+

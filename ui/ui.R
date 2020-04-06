@@ -49,12 +49,7 @@ ui <- dashboardPage(
     collapsible = T,
     width=NULL,
     div(DT::DTOutput('table2'))
-  )))),
-  
-  
-  fluidRow(
-    uiOutput("constituents_bar_graph")
-  )),
+  ))))),
   
   skin = "green"
 )

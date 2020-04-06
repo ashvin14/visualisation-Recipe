@@ -1,3 +1,4 @@
+
 library(tidyverse)
 # get_ingredients <- function(molten_dataframe, recipe_title) {
 #   result <- molten_dataframe[molten_dataframe$title == recipe_title,]
@@ -54,16 +55,36 @@ deleteButtonColumn <- function(df, id, ...) {
                 ))
 }
 
+# get_constituents <- function(molten_dataframe, recipe_titles) {
+#   
+#   result <- recipe_dataset[recipe_dataset$title %in% recipe_titles$Recipes,]
+#   
+#   consitituents <- tibble(
+#     "title" = recipe_titles$Recipes,
+#     "calories" = result$calories,
+#     "protein" = result$protein,
+#     "fat" = result$fat,
+#     "sodium" = result$sodium
+#   )
+#   print(consitituents)
+#   return(consitituents)
+# }
+
 
 parseDeleteEvent <- function(idstr) {
   res <- as.integer(sub(".*_([0-9]+)", "\\1", idstr))
   if (! is.na(res)) res
 }
 
+
 nutri_table <- function(df,t,number) {
+
   new<-df%>%filter(title==c(t))%>%select(Fat,Energy,Protein,`Saturated fat`,Sodium,Sugar)
+  print("printing new..")
+  print(new)
   tran<-pivot_longer(new,cols=c(1:6),names_to = c('Nutrition.Name'),values_to='Value')
   trans<-as.data.frame(tran)
+  
   if ((!is.null(number) & number!=0)){
     trans[,2]<-trans[,2]*(number)
   } else if (number==0){
