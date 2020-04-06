@@ -54,11 +54,17 @@ ui <- dashboardPage(
     'Protein'
   ))
 
+
   ),
   fluidPage(fluidRow(
     uiOutput("RecipeListUI"),
     uiOutput("groceryListUI")
     
+  ),
+  fluidRow(
+    uiOutput("InstructionRecipe"),
+    uiOutput("instructionSteps")
+
   )),
   conditionalPanel(condition = 'input.table2.length >0',
   fluidRow(column(width=5,style='padding-top:100px',box(
