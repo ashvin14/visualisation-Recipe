@@ -92,8 +92,6 @@ parseDeleteEvent <- function(idstr) {
 nutri_table <- function(df, t, number) {
   new <-
     df %>% filter(title == c(t)) %>% select(Fat, Energy, Protein, `Saturated fat`, Sodium, Sugar)
-  print("printing new..")
-  print(new)
   tran <-
     pivot_longer(
       new,
