@@ -233,6 +233,9 @@ ui <- dashboardPage(
     ),column(width = 4,
              plotly::plotlyOutput('bubble_chart')
     )),
+    fluidRow(column(width=5,(
+      plotly::plotlyOutput('density_plot')
+    ))),
     fluidRow(
       uiOutput("centralPlot")
     )
