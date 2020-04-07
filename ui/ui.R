@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 source("./data/data.R")
+library(dashboardthemes)
 
 logo_personal <- shinyDashboardLogoDIY(
   
@@ -175,12 +176,12 @@ theme_purple_gradient <- shinyDashboardThemeDIY(
 # define UI logic
 ui <- dashboardPage(
   # Application title
-
+  
   dashboardHeader(title = logo_personal),
   dashboardSidebar(
     width = 400,
     
-
+    
     selectizeInput(
       inputId = "recipe",
       label = "Recipe",
@@ -196,7 +197,7 @@ ui <- dashboardPage(
     # actionButton("Add",
     #              "Add",
     #              icon = icon("cart-plus"))
-
+    
     
     conditionalPanel('input.recipe != ""',
                      uiOutput('quantity'),
@@ -206,7 +207,8 @@ ui <- dashboardPage(
   dashboardBody(
     theme_purple_gradient
     ,tags$head(tags$style(HTML(
-
+      
+      
       '{margin:5px;}'
     ))),
     fluidRow(width =5,(
@@ -217,13 +219,13 @@ ui <- dashboardPage(
       (valueBoxOutput('Saturated_Fat')),
       (valueBoxOutput('Sugar'))
     ),
-
+    
     fluidPage(fluidRow(
       uiOutput("RecipeListUI"),
       uiOutput("groceryListUI")
       
     ),
-
+    
     fluidRow(
       uiOutput("instructionUI"),
       uiOutput("instructionSteps")
@@ -245,4 +247,3 @@ ui <- dashboardPage(
   )
   
 )
-

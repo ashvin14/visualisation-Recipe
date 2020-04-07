@@ -24,9 +24,9 @@ get_ingredients <- function(recipe_title) {
 get_Weight <- function(recipe_title) {
   Weight <- list()
   result <- recipe_data[recipe_data$title == recipe_title,]
-  print('xyz..........')
+
   print(result$weight_per_ingr)
-  print('abc..........')
+
   Weight_list <- strsplit(result$weight_per_ingr, ",")
   j <- length(Weight_list[[1]])
   for (i in 1:j) {
@@ -100,7 +100,6 @@ nutri_table <- function(df, t, number) {
       values_to = 'Value'
     )
   trans <- as.data.frame(tran)
-  print(trans)
   if ((!is.null(number) & number != 0)) {
     trans[, 2] <- trans[, 2] * (number)
   } else if (number == 0) {
@@ -119,4 +118,13 @@ get_instructions <- function(recipe_list) {
      
   }
   return(instructions_list)
+}
+
+get_nutr_per_100gm <- function(recipe_list) {
+  nutr_list <- list()
+  for (recipe_title in recipe_list$Recipes){
+    temp_df <- 
+      recipe_data %>% filter(title == recipe_title) %>% select(nutr_per_100gm)
+    nutr_list[recipe_title] <- fromJSON(gsub("\'", "\"", temp_df$nutr_per_100gm))
+  }
 }

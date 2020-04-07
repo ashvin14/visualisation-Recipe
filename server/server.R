@@ -6,6 +6,8 @@
 
 
 
+
+
 library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
@@ -92,10 +94,10 @@ server <- function(input, output) {
         print('abc-------------')
         grocery_data$df[nrow(grocery_data$df) + 1, ] <-
           c(ingredients[i], round(as.double(Weights[i]), 2))
-
+        
         print(grocery_data$df[nrow(grocery_data$df) + 1, ])
         
-
+        
       }
       
       else
@@ -161,53 +163,45 @@ server <- function(input, output) {
     
     
     output$centralPlot <- renderUI({
-      labels = list()
-      
-      for(i in 1:length(values$col1)){
-        labels[i] <- paste(values$col1$`Nutrition.Name`[i],"(",values$col1$units[i],")")
-      }
-      trace1 <- list(
-        hole = 0.9,
-        type = "pie",
-        labels = labels,
-        values = values$col1$Value,
-        showlegend = TRUE
-      )
-      aggregation_of_ingredients <- grocery_data$df %>% group_by(Ingredients) %>% count()
+      aggregation_of_ingredients <- grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight))
       print(aggregation_of_ingredients)
       trace2 <- list(
-        pie = 0.4,
+        hole = 0.9,
         type = "pie",
         labels = aggregation_of_ingredients$Ingredients,
-        values = aggregation_of_ingredients$n,
+        values = aggregation_of_ingredients$totalWeight,
         showlegend = T
       )
-      layout <- list(
-        xaxis = list(
-                     domain = c(0.33, 0.67)),
-        yaxis = list(domain = c(0.33, 0.67))
-      )
+      layout <- list(title = "Compositions of Ingredients by Weight",
+        xaxis = list(domain = c(0.33, 0.67)),
+                     yaxis = list(domain = c(0.33, 0.67)))
       p <- plot_ly()
       p <-
         add_trace(
           p,
-          hole = trace1$hole,
-          type = trace1$type,
-          labels = trace1$labels,
-          values = trace1$values,
-          showlegend = trace1$showlegend
+          hole = trace2$hole,
+          type = trace2$type,
+          labels = trace2$labels,
+          values = trace2$values,
+          showlegend = trace2$showlegend
         )
-      # p <- add_trace(
-      #   p,
-      #   hole = trace2$hole,
-      #   type = trace2$type,
-      #   labels = trace2$labels,
-      #   y = trace2$values,
-      #   showlegend = trace2$showlegend
-      # )
-      p <- layout(p, title=layout$title, xaxis=layout$xaxis, yaxis=layout$yaxis)
+      p <-
+        layout(
+          p,
+          title = layout$title,
+          xaxis = layout$xaxis,
+          yaxis = layout$yaxis
+        )
       box(p)
     })
+    
+     output$barplot <- renderUI({
+    #   box(grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight)) %>% plot_ly(
+    #     x = ~ Ingredients,
+    #     y = ~ totalWeight,
+    #     type = "bar"
+    #   ) %>% layout(title = "Distribution of Groceries", xaxis = list(title = "Groceries"), yaxis = list(title = "Total Weight in Grams")))
+     })
     #box(recipe_df$df$Recipes[i],cola)
     
     
@@ -218,47 +212,25 @@ server <- function(input, output) {
     output$instructionSteps <- renderUI({
       i <- 1
       steps <- ""
-      #3for (instructions in instructions[input$InstructionRecipe]){
-      #3  for (i in 1:length(instructions)){
-      #3    steps = paste(steps,"Step", i, ':', instructions[i])
-      #3    print(steps)
-      #  }
-        return(
-          box(
-            title = input$InstructionRecipe,
-            width = 6,
-            solidHeader = TRUE,
-            status = "success",
-            renderUI(
-              for (instructions in instructions[input$InstructionRecipe]){
-                return(lapply(1:length(instructions),function(i){
-                    p(paste0("Step ",i, ": ",instructions[i]))
-                }))
-              }
-            )
-          )
+      
+      return(
+        box(
+          title = input$InstructionRecipe,
+          width = 6,
+          solidHeader = TRUE,
+          status = "success",
+          renderUI(for (instructions in instructions[input$InstructionRecipe]) {
+            return(lapply(1:length(instructions), function(i) {
+              p(paste0("Step ", i, ": ", instructions[i]))
+            }))
+          })
         )
-      #3s}
+      )
+      
       
     })
-    # output$instructionSteps <- renderUI({
-    #   for (instructions in instructions[input$InstructionRecipe]) {
-    #     return(lapply(1:length(instructions), function(i) {
-    #       box(
-    #         title = paste("Step ", i),
-    #         width = NULL,
-    #         solidHeader = TRUE,
-    #         status = "warning",
-    #         renderText(instructions[i])
-    #         
-    #         
-    #       )
-    #     }))
-    #     
-    #   }
-    # })
   })
-
+  
   output$recipe_df <- DT::renderDataTable({
     recipe_df$df
   }, rownames = FALSE)
@@ -279,9 +251,9 @@ server <- function(input, output) {
   
   
   
- 
   
-
+  
+  
   df <-
     data.frame('Nutrition.Name' = character(), 'Value' = integer())
   
@@ -450,11 +422,11 @@ server <- function(input, output) {
       }
     })
   })
-
+  
   # observeEvent(input$Add, {
-  #   
+  #
   # })
-  # 
+  #
   
   
   
