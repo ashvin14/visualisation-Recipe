@@ -199,68 +199,50 @@ ui <- dashboardPage(
 
     
     conditionalPanel('input.recipe != ""',
-    uiOutput('quantity'),
-    uiOutput("add"))
+                     uiOutput('quantity'),
+                     uiOutput("add"))
   ),
-
+  
   dashboardBody(
     theme_purple_gradient
     ,tags$head(tags$style(HTML(
-    '{margin:5px;}'
-  ))),
-  fluidRow(width =5,(
-    valueBoxOutput('calories')),
-  (valueBoxOutput('Protein')),
-  (valueBoxOutput('Sodium')),
-  (valueBoxOutput('Fat')),
-  (valueBoxOutput('Saturated_Fat')),
-  (valueBoxOutput('Sugar'))
-  ),
-  dashboardBody(
-    tags$head(tags$style(HTML('{margin:5px;}'))),
-    fluidRow(width = 5, (valueBoxOutput('calories')),
-             (valueBoxOutput('Protein'))),
+
+      '{margin:5px;}'
+    ))),
+    fluidRow(width =5,(
+      valueBoxOutput('calories')),
+      (valueBoxOutput('Protein')),
+      (valueBoxOutput('Sodium')),
+      (valueBoxOutput('Fat')),
+      (valueBoxOutput('Saturated_Fat')),
+      (valueBoxOutput('Sugar'))
+    ),
+
     fluidPage(fluidRow(
       uiOutput("RecipeListUI"),
       uiOutput("groceryListUI")
       
     ),
-    fluidRow(uiOutput("centralPlot"))),
-    conditionalPanel(condition = 'input.Add==1',
-                     fluidRow(
-                       column(
-                         width = 5,
-                         style = 'padding-top:100px',
-                         box(
-                           title = 'Nutrition Table',
-                           solidHeader = T,
-                           collapsible = T,
-                           width = NULL,
-                           div(DT::DTOutput('table2'))
-                         )
-                       )
-                     )),
-    
-    
-    fluidRow(uiOutput("constituents_bar_graph"))
-  ),
 
-  fluidRow(
-    uiOutput("instructionUI"),
-    uiOutput("instructionSteps")
-
-  )),
-  # conditionalPanel(condition = 'input.table2.length >0',
-  # fluidRow(column(width=5,style='padding-top:100px',box(
-  #   title='Nutrition Table',
-  #   solidHeader = T,
-  #   collapsible = T,
-  #   width=NULL,
-  #   div(DT::DTOutput('table2'))
-  # 
-  # )))
-  # )
-  #)
-
-
+    fluidRow(
+      uiOutput("instructionUI"),
+      uiOutput("instructionSteps")
+      
+    )),
+    fluidRow(
+      uiOutput("centralPlot")
+    )
+    # conditionalPanel(condition = 'input.table2.length >0',
+    # fluidRow(column(width=5,style='padding-top:100px',box(
+    #   title='Nutrition Table',
+    #   solidHeader = T,
+    #   collapsible = T,
+    #   width=NULL,
+    #   div(DT::DTOutput('table2'))
+    # 
+    # )))
+    # )
+  )
+  
 )
+
