@@ -25,6 +25,8 @@ server <- function(input, output) {
   
   bubble_df<-shiny::reactiveValues()
   
+  density_df<-shiny::reactiveValues()
+  
   
   # change this
   # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
@@ -383,36 +385,35 @@ bubble_df<-data.frame('title'=character(),'weights'=integer(),'quantity'=integer
     }
   
 output$bubble_chart<-plotly::renderPlotly({
-  fig<-plot_ly(bubble_df,x = ~quantity ,y= ~weights,type='scatter', mode= 'makers',
-                 size= ~weights, color= ~title,colors='Paired'
-                 ,markers=list(size= ~weights,opacity=0.5) ,hoverinfo = 'text',
-                 text = ~paste('Recipe :',title,'Ingredient.:', ingredients,
-                               '<br>Quantity.:' ,quantity,'<br> Measure:', weights,units))
-    fig <- fig %>% layout(title = 'Recipe Composition',showlegend=F,
-                          xaxis = list(title = 'Quantity',
-                                       gridcolor = 'rgb(255, 255, 255)',
-                                       type = 'log',
-                                       zerolinewidth = 1,
-                                       showgrid=F,
-                                       zeroline=F,
-                                       visible=F,
-                                       ticklen = 5,
-                                       gridwidth = 2),
-                          yaxis = list(title = 'Weights',
-                                       gridcolor = 'rgb(255, 255, 255)',
-                                       zerolinewidth = 1,
-                                       showgrid=F,
-                                       zeroline=F,
-                                       visible=F,
-                                       ticklen = 5,
-                                       gridwith = 2),
-                          paper_bgcolor = 'rgb(0)',
-                          plot_bgcolor = 'rgb(0)')
-    fig
-    
+  colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
+  fig<-plot_ly(bubble_df, x = ~quantity ,y= ~weights,type='scatter', mode= 'markers', color= ~title,sizes=c(50,100),colors=colors
+               ,marker=list(sizemode='diameter',opacity=0.5,size= ~sqrt(weights)*2) ,hoverinfo = 'text',text = ~paste('Recipe :',title,'<br>Ingredient:', ingredients,'<br> Measure:', weights,units))
+  title<-list(family="Lobster",color='rgb(128,177,221)',size=20)
+  fig <- fig %>% layout(title = 'Recipe Composition',showlegend=F,font=title,margin = list(l=50, r=50, b=100, t=100, pad=4),
+                        xaxis = list(title = 'Quantity',
+                                     type = 'log',
+                                     showgrid=F,
+                                     zeroline=F,
+                                     visible=F),
+                        yaxis = list(title = 'Weights',
+                                     type='log',
+                                     showgrid=F,
+                                     zeroline=F,
+                                     visible=F),
+                        paper_bgcolor = 'rgb(0,0,0,0)',
+                        plot_bgcolor = 'rgb(0,0,0,0)')
+  fig
+
   })
 })
+
   
 }
+
+
+
+
+
+
 
 

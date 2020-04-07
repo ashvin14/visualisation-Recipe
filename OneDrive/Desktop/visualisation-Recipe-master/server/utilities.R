@@ -114,9 +114,9 @@ nutri_table <- function(df, t, number) {
 get_instructions <- function(recipe_list) {
   instructions_list <- list()
   for (recipe_title in recipe_list$Recipes) {
-    print(recipe_data %>% filter(title == recipe_title) %>% select(instructions))
+    print(recipe_data %>% filter(title == recipe_title) %>% dplyr::select(instructions))
     temp_df <-
-      recipe_data  %>% filter(title == recipe_title) %>% select(instructions)
+      recipe_data  %>% filter(title == recipe_title) %>% dplyr::select(instructions)
     instructions_list[recipe_title] <- fromJSON(gsub("\'", "\"", temp_df$instructions[1]))
      
   }

@@ -24,6 +24,8 @@ colnames(recipe_data) <-
     'weight_per_ingr'
   )
 
+bubble_data<-read.csv('data/Bubble.csv')
+head(bubble_data)
 
 pattern = "\\[\\{'text': "
 ingredients <- str_remove(recipe_data$ingredient_list, pattern)
@@ -115,8 +117,6 @@ for (i in (1:length(recipe_data$nutr_per_ingr)))
   df <- df %>% rename('fat.1' = 'fat')
   nutritiontable[nrow(nutritiontable) + 1, 1:7] <- df
 }
-
-
 
 
 options(scipen=999)

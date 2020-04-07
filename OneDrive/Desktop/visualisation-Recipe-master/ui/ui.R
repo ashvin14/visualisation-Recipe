@@ -219,11 +219,18 @@ ui <- dashboardPage(
     uiOutput("groceryListUI")
     
   ),
-  fluidRow(
+  fluidRow(column(width = 5,
     uiOutput("instructionUI"),
     uiOutput("instructionSteps")
 
-  )),
+  ),column(width = 4,
+  plotly::plotlyOutput('bubble_chart')
+  ))),
+  fluidRow(column(width=5,(
+    plotly::plotlyOutput('density_plot')
+  )))
+  
+  
   # conditionalPanel(condition = 'input.table2.length >0',
   # fluidRow(column(width=5,style='padding-top:100px',box(
   #   title='Nutrition Table',
