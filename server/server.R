@@ -1,3 +1,11 @@
+
+
+
+
+
+
+
+
 library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
@@ -65,7 +73,7 @@ server <- function(input, output) {
     ingredients <-
       as.vector(get_ingredients(input$recipe))
     
-    recipe_df$df[nrow(recipe_df$df) + 1,] <- input$recipe
+    recipe_df$df[nrow(recipe_df$df) + 1, ] <- input$recipe
     
     #grocery_df$df <- as.data.frame(grocery_df$df, stringsAsFactors = F)
     grocery_data$df <-
@@ -82,15 +90,18 @@ server <- function(input, output) {
       # print(ingredients[[i]])
       if (!(any(grocery_data$df$Ingredients == ingredients[i]))) {
         print('abc-------------')
-        grocery_data$df[nrow(grocery_data$df) + 1,] <-
+        grocery_data$df[nrow(grocery_data$df) + 1, ] <-
           c(ingredients[i], round(as.double(Weights[i]), 2))
-        print(grocery_data$df[nrow(grocery_data$df) + 1,])
+
+        print(grocery_data$df[nrow(grocery_data$df) + 1, ])
+        
+
       }
       
       else
       {
         k <-
-          grocery_data$df[grocery_data$df$Ingredients == ingredients[i],]
+          grocery_data$df[grocery_data$df$Ingredients == ingredients[i], ]
         #print(k)
         weight <-
           as.double(grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]]) + as.double(Weights[i])
@@ -132,6 +143,71 @@ server <- function(input, output) {
                   choices = recipe_df$df$Recipes)
     })
     
+    df <-
+      data.frame('Nutrition.Name' = character(), 'Value' = integer())
+    values$number <- input$number
+    for (i in recipe_df$df$Recipes) {
+      de <- nutri_table(recipe_data, i, values$number)
+      df <- rbind(df, de)
+    }
+    output$table2 <- DT::renderDataTable({
+      shiny::validate(need(df, ''))
+      df <-
+        df %>% group_by(Nutrition.Name) %>% summarize(Value = sum(Value))
+      u <- c('KJ(cal)', 'gram', 'gram', 'gram', 'mg', 'gram')
+      values$col1 <- data.frame(df, units = u)
+      values$col1
+    })
+    
+    
+    output$centralPlot <- renderUI({
+      labels = list()
+      
+      for(i in 1:length(values$col1)){
+        labels[i] <- paste(values$col1$`Nutrition.Name`[i],"(",values$col1$units[i],")")
+      }
+      trace1 <- list(
+        hole = 0.9,
+        type = "pie",
+        labels = labels,
+        values = values$col1$Value,
+        showlegend = TRUE
+      )
+      aggregation_of_ingredients <- grocery_data$df %>% group_by(Ingredients) %>% count()
+      print(aggregation_of_ingredients)
+      trace2 <- list(
+        pie = 0.4,
+        type = "pie",
+        labels = aggregation_of_ingredients$Ingredients,
+        values = aggregation_of_ingredients$n,
+        showlegend = T
+      )
+      layout <- list(
+        xaxis = list(
+                     domain = c(0.33, 0.67)),
+        yaxis = list(domain = c(0.33, 0.67))
+      )
+      p <- plot_ly()
+      p <-
+        add_trace(
+          p,
+          hole = trace1$hole,
+          type = trace1$type,
+          labels = trace1$labels,
+          values = trace1$values,
+          showlegend = trace1$showlegend
+        )
+      # p <- add_trace(
+      #   p,
+      #   hole = trace2$hole,
+      #   type = trace2$type,
+      #   labels = trace2$labels,
+      #   y = trace2$values,
+      #   showlegend = trace2$showlegend
+      # )
+      p <- layout(p, title=layout$title, xaxis=layout$xaxis, yaxis=layout$yaxis)
+      box(p)
+    })
     #box(recipe_df$df$Recipes[i],cola)
     
     
@@ -194,17 +270,18 @@ server <- function(input, output) {
     rowNum <- parseDeleteEvent(input$deletePressed)
     grocery_data$df <-
       data.frame(grocery_data$df, stringsAsFactors = F)
-    dataRow <- grocery_data$df[rowNum, ]
+    dataRow <- grocery_data$df[rowNum,]
     values$deletedRows <- rbind(dataRow, values$deletedRows)
     values$deletedRowIndices <-
       append(values$deletedRowIndices, rowNum, after = 0)
-    grocery_data$df <- grocery_data$df[-(rowNum), ]
+    grocery_data$df <- grocery_data$df[-(rowNum),]
   })
   
   
   
  
   
+
   df <-
     data.frame('Nutrition.Name' = character(), 'Value' = integer())
   
@@ -373,7 +450,11 @@ server <- function(input, output) {
       }
     })
   })
-  
+
+  # observeEvent(input$Add, {
+  #   
+  # })
+  # 
   
   
   
