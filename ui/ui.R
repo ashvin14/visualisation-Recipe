@@ -226,10 +226,12 @@ ui <- dashboardPage(
       
     ),
     
-    fluidRow(
-      uiOutput("instructionUI"),
-      uiOutput("instructionSteps")
-      
+    fluidRow(column(width = 5,
+                    uiOutput("instructionUI"),
+                    uiOutput("instructionSteps")
+                    
+    ),column(width = 4,
+             plotly::plotlyOutput('bubble_chart')
     )),
     fluidRow(
       uiOutput("centralPlot")

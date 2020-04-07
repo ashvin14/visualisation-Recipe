@@ -6,7 +6,8 @@
 # molten_filtered_recipe_dataset2 <- read.csv("data/epi_r2.csv")
 
 recipe_csv <- read.csv("data/final_data.csv")
-
+bubble_data<-read.csv('data/Bubble.csv')
+head(bubble_data)
 recipe_data <- recipe_csv[c(3, 5, 6, 7, 9, 10, 13, 14, 16, 18, 20)]
 
 colnames(recipe_data) <-

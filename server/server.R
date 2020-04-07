@@ -8,6 +8,7 @@
 
 
 
+
 library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
@@ -32,6 +33,10 @@ server <- function(input, output) {
   recipe_df <- shiny::reactiveValues()
   
   grocery_data <- shiny::reactiveValues()
+  
+  bubble_df<-shiny::reactiveValues()
+  
+  density_df<-shiny::reactiveValues()
   
   
   # change this
@@ -75,7 +80,7 @@ server <- function(input, output) {
     ingredients <-
       as.vector(get_ingredients(input$recipe))
     
-    recipe_df$df[nrow(recipe_df$df) + 1, ] <- input$recipe
+    recipe_df$df[nrow(recipe_df$df) + 1,] <- input$recipe
     
     #grocery_df$df <- as.data.frame(grocery_df$df, stringsAsFactors = F)
     grocery_data$df <-
@@ -92,10 +97,10 @@ server <- function(input, output) {
       # print(ingredients[[i]])
       if (!(any(grocery_data$df$Ingredients == ingredients[i]))) {
         print('abc-------------')
-        grocery_data$df[nrow(grocery_data$df) + 1, ] <-
+        grocery_data$df[nrow(grocery_data$df) + 1,] <-
           c(ingredients[i], round(as.double(Weights[i]), 2))
         
-        print(grocery_data$df[nrow(grocery_data$df) + 1, ])
+        print(grocery_data$df[nrow(grocery_data$df) + 1,])
         
         
       }
@@ -103,7 +108,7 @@ server <- function(input, output) {
       else
       {
         k <-
-          grocery_data$df[grocery_data$df$Ingredients == ingredients[i], ]
+          grocery_data$df[grocery_data$df$Ingredients == ingredients[i],]
         #print(k)
         weight <-
           as.double(grocery_data$df$Weight[grocery_data$df$Ingredients == ingredients[i]]) + as.double(Weights[i])
@@ -163,7 +168,8 @@ server <- function(input, output) {
     
     
     output$centralPlot <- renderUI({
-      aggregation_of_ingredients <- grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight))
+      aggregation_of_ingredients <-
+        grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight))
       print(aggregation_of_ingredients)
       trace2 <- list(
         hole = 0.9,
@@ -172,9 +178,12 @@ server <- function(input, output) {
         values = aggregation_of_ingredients$totalWeight,
         showlegend = T
       )
-      layout <- list(title = "Compositions of Ingredients by Weight",
-        xaxis = list(domain = c(0.33, 0.67)),
-                     yaxis = list(domain = c(0.33, 0.67)))
+      layout <-
+        list(
+          title = "Compositions of Ingredients by Weight",
+          xaxis = list(domain = c(0.33, 0.67)),
+          yaxis = list(domain = c(0.33, 0.67))
+        )
       p <- plot_ly()
       p <-
         add_trace(
@@ -195,14 +204,92 @@ server <- function(input, output) {
       box(p)
     })
     
-     output$barplot <- renderUI({
-    #   box(grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight)) %>% plot_ly(
-    #     x = ~ Ingredients,
-    #     y = ~ totalWeight,
-    #     type = "bar"
-    #   ) %>% layout(title = "Distribution of Groceries", xaxis = list(title = "Groceries"), yaxis = list(title = "Total Weight in Grams")))
-     })
+    output$barplot <- renderUI({
+      #   box(grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight)) %>% plot_ly(
+      #     x = ~ Ingredients,
+      #     y = ~ totalWeight,
+      #     type = "bar"
+      #   ) %>% layout(title = "Distribution of Groceries", xaxis = list(title = "Groceries"), yaxis = list(title = "Total Weight in Grams")))
+    })
     #box(recipe_df$df$Recipes[i],cola)
+    bubble_df <-
+      data.frame(
+        'title' = character(),
+        'weights' = integer(),
+        'quantity' = integer(),
+        'units' = character(),
+        'ingredients' = character()
+      )
+    for (i in recipe_df$df$Recipes) {
+      row_data <- bubble_data %>% filter(title == c(i))
+      bubble_df <- rbind(bubble_df, row_data)
+    }
+    
+    output$bubble_chart <- plotly::renderPlotly({
+      colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
+      fig <-
+        plot_ly(
+          bubble_df,
+          x = ~ quantity ,
+          y = ~ weights,
+          type = 'scatter',
+          mode = 'markers',
+          color = ~ title,
+          sizes = c(50, 100),
+          colors = colors
+          ,
+          marker = list(
+            sizemode = 'diameter',
+            opacity = 0.5,
+            size = ~ sqrt(weights) * 2
+          ) ,
+          hoverinfo = 'text',
+          text = ~ paste(
+            'Recipe :',
+            title,
+            '<br>Ingredient:',
+            ingredients,
+            '<br> Measure:',
+            weights,
+            units
+          )
+        )
+      title <-
+        list(family = "Lobster",
+             color = 'rgb(128,177,221)',
+             size = 20)
+      fig <-
+        fig %>% layout(
+          title = 'Recipe Composition',
+          showlegend = F,
+          font = title,
+          margin = list(
+            l = 50,
+            r = 50,
+            b = 100,
+            t = 100,
+            pad = 4
+          ),
+          xaxis = list(
+            title = 'Quantity',
+            type = 'log',
+            showgrid = F,
+            zeroline = F,
+            visible = F
+          ),
+          yaxis = list(
+            title = 'Weights',
+            type = 'log',
+            showgrid = F,
+            zeroline = F,
+            visible = F
+          ),
+          paper_bgcolor = 'rgb(0,0,0,0)',
+          plot_bgcolor = 'rgb(0,0,0,0)'
+        )
+      fig
+      
+    })
     
     
   })
@@ -242,11 +329,11 @@ server <- function(input, output) {
     rowNum <- parseDeleteEvent(input$deletePressed)
     grocery_data$df <-
       data.frame(grocery_data$df, stringsAsFactors = F)
-    dataRow <- grocery_data$df[rowNum,]
+    dataRow <- grocery_data$df[rowNum, ]
     values$deletedRows <- rbind(dataRow, values$deletedRows)
     values$deletedRowIndices <-
       append(values$deletedRowIndices, rowNum, after = 0)
-    grocery_data$df <- grocery_data$df[-(rowNum),]
+    grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
   
