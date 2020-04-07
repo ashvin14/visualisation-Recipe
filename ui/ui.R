@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 source("./data/data.R")
+library(dashboardthemes)
 
 logo_personal <- shinyDashboardLogoDIY(
   
@@ -206,6 +207,7 @@ ui <- dashboardPage(
   dashboardBody(
     theme_purple_gradient
     ,tags$head(tags$style(HTML(
+
 
       '{margin:5px;}'
     ))),
