@@ -102,7 +102,7 @@ nutri_table <- function(df, t, number) {
       values_to = 'Value'
     )
   trans <- as.data.frame(tran)
-  
+  print(trans)
   if ((!is.null(number) & number != 0)) {
     trans[, 2] <- trans[, 2] * (number)
   } else if (number == 0) {

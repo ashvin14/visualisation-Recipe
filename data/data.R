@@ -24,9 +24,6 @@ colnames(recipe_data) <-
     'weight_per_ingr'
   )
 
-head(recipe_data)
-
-recipe_data$ingredient_list[1]
 
 pattern = "\\[\\{'text': "
 ingredients <- str_remove(recipe_data$ingredient_list, pattern)
@@ -134,16 +131,4 @@ recipe_data
 
 
 
-# scroll <- image_read("data/scroll.png")
-#
-# #print(scroll)
-# scroll <- image_scale(scroll, "300")
-# scroll <- image_scale(scroll, "x300")
-#
-# list_directions <- json_data[[1]]["title"]
-# text_directions <- paste(list_directions, collapse = "\n")
-#
-# print(text_directions)
-#
-# image_annotate(scroll, text_directions, size = 15, color = "green",
-#                location = "+20+100")
+

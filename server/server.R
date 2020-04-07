@@ -1,8 +1,3 @@
-
-
-
-
-
 library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
@@ -46,6 +41,16 @@ server <- function(input, output) {
   
   
   observeEvent(input$recipe, {
+    output$quantity <- renderUI({
+      numericInput(
+        'number',
+        'Enter the number of servings',
+        value = 1,
+        min = 0,
+        max = 100,
+        step = 1
+      )
+    })
     output$add <- renderUI({
       actionButton(
         inputId = "Add",
@@ -53,7 +58,6 @@ server <- function(input, output) {
         icon = icon("cart-plus")
       )
     })
-    
     values$deletedRows <- NULL
     values$deletedRowIndices = list()
   })
@@ -81,7 +85,6 @@ server <- function(input, output) {
         grocery_data$df[nrow(grocery_data$df) + 1,] <-
           c(ingredients[i], round(as.double(Weights[i]), 2))
         print(grocery_data$df[nrow(grocery_data$df) + 1,])
-        
       }
       
       else
@@ -137,23 +140,49 @@ server <- function(input, output) {
   observeEvent(input$InstructionRecipe, {
     instructions <- get_instructions(recipe_df$df)
     output$instructionSteps <- renderUI({
-      for (instructions in instructions[input$InstructionRecipe]) {
-        return(lapply(1:length(instructions), function(i) {
+      i <- 1
+      steps <- ""
+      #3for (instructions in instructions[input$InstructionRecipe]){
+      #3  for (i in 1:length(instructions)){
+      #3    steps = paste(steps,"Step", i, ':', instructions[i])
+      #3    print(steps)
+      #  }
+        return(
           box(
-            title = paste("Step ", i),
-            width = NULL,
+            title = input$InstructionRecipe,
+            width = 6,
             solidHeader = TRUE,
-            status = "warning",
-            renderText(instructions[i])
+            status = "success",
+            renderUI(
+              for (instructions in instructions[input$InstructionRecipe]){
+                return(lapply(1:length(instructions),function(i){
+                    p(paste0("Step ",i, ": ",instructions[i]))
+                }))
+              }
+            )
           )
-        }))
-        
-      }
+        )
+      #3s}
+      
     })
+    # output$instructionSteps <- renderUI({
+    #   for (instructions in instructions[input$InstructionRecipe]) {
+    #     return(lapply(1:length(instructions), function(i) {
+    #       box(
+    #         title = paste("Step ", i),
+    #         width = NULL,
+    #         solidHeader = TRUE,
+    #         status = "warning",
+    #         renderText(instructions[i])
+    #         
+    #         
+    #       )
+    #     }))
+    #     
+    #   }
+    # })
   })
-  
-  
-  
+
   output$recipe_df <- DT::renderDataTable({
     recipe_df$df
   }, rownames = FALSE)
@@ -174,17 +203,7 @@ server <- function(input, output) {
   
   
   
-  output$quantity <- renderUI({
-    numericInput(
-      'number',
-      'Enter the number of servings',
-      value = 1,
-      min = 0,
-      max = 100,
-      step = 1
-    )
-    
-  })
+ 
   
   df <-
     data.frame('Nutrition.Name' = character(), 'Value' = integer())
@@ -192,67 +211,170 @@ server <- function(input, output) {
   observeEvent(input$Add, {
     values$number <- input$number
     for (i in recipe_df$df$Recipes) {
+      print("Dimple1.................................................")
       de <- nutri_table(recipe_data, i, values$number)
       df <- rbind(df, de)
+      print("Dimple2..............................................")
+      print(df)
     }
-    output$table2 <- DT::renderDataTable({
-      shiny::validate(need(df, ''))
+    # output$table2 <- DT::renderDataTable({
+    #   #shiny::validate(need(df, ''))
+    #   df <-
+    #     df %>% group_by(Nutrition.Name) %>% summarize(Value = sum(Value))
+    #   u <- c('KJ(cal)', 'gram', 'gram', 'gram', 'mg', 'gram')
+    #   values$col1 <- data.frame(df, units = u)
+    #   print("Dimple3...............................................")
+    #   print(values$col1)
+    # })
+    
+    output$calories <- renderValueBox ({
       df <-
         df %>% group_by(Nutrition.Name) %>% summarize(Value = sum(Value))
       u <- c('KJ(cal)', 'gram', 'gram', 'gram', 'mg', 'gram')
       values$col1 <- data.frame(df, units = u)
-      values$col1
+      print("Dimple3...............................................")
+      #validate(need(values$col1, ''))
+      dat <-
+        values$col1 %>% filter(Nutrition.Name == 'Energy') %>% select(Value)
+      if (nrow(dat) > 0) {
+        valueBox(
+          paste(dat$Value, 'Kcal'),
+          'Energy',
+          icon = icon('fire'),
+          color = 'red',
+          width = NULL
+        )
+      }
+      
+      else{
+        valueBox(
+          'Add Recipe',
+          'Energy',
+          icon = icon('fire'),
+          color = 'red',
+          width = NULL
+        )
+      }
+      
+    })
+    output$Protein <- renderValueBox({
+      #validate(need(values$col1, ''))
+      df1 <-
+        values$col1 %>% filter(Nutrition.Name == 'Protein') %>% select(Value)
+      if (nrow(df1) > 0) {
+        valueBox(
+          paste(df1$Value, 'gm'),
+          'Protein',
+          icon = icon('child'),
+          color = 'maroon',
+          width = NULL
+        )
+      }
+      else{
+        valueBox(
+          'Add Recipe',
+          'Protein',
+          icon = icon('child'),
+          color = 'maroon',
+          width = NULL
+        )
+      }
+    })
+    output$Fat <- renderValueBox({
+      #validate(need(values$col1, ''))
+      df1 <-
+        values$col1 %>% filter(Nutrition.Name == 'Fat') %>% select(Value)
+      if (nrow(df1) > 0) {
+        valueBox(
+          paste(df1$Value, 'gm'),
+          'Fat',
+          icon = icon('drumstick-bite'),
+          color = 'yellow',
+          width = NULL
+        )
+      }
+      else{
+        valueBox(
+          'Add Recipe',
+          'Fat',
+          icon = icon('baby'),
+          color = 'yellow',
+          width = NULL
+        )
+      }
+    })
+    output$Sodium <- renderValueBox({
+      #validate(need(values$col1, ''))
+      df1 <-
+        values$col1 %>% filter(Nutrition.Name == 'Sodium') %>% select(Value)
+      if (nrow(df1) > 0) {
+        valueBox(
+          paste(df1$Value, 'mg'),
+          'Sodium',
+          icon = icon('mortar-pestle'),
+          color = 'blue',
+          width = NULL
+        )
+      }
+      else{
+        valueBox(
+          'Add Recipe',
+          'Sodium',
+          icon = icon('baby'),
+          color = 'blue',
+          width = NULL
+        )
+      }
+    })
+    output$Saturated_Fat <- renderValueBox({
+      #validate(need(values$col1, ''))
+      df1 <-
+        values$col1 %>% filter(Nutrition.Name == 'Saturated fat') %>% select(Value)
+      if (nrow(df1) > 0) {
+        valueBox(
+          paste(df1$Value, 'gm'),
+          'Saturated Fat',
+          icon = icon('beer'),
+          color = 'orange',
+          width = NULL
+        )
+      }
+      else{
+        valueBox(
+          'Add Recipe',
+          'Saturated Fat',
+          icon = icon('pizza-slice'),
+          color = 'orange',
+          width = NULL
+        )
+      }
+    })
+    output$Sugar <- renderValueBox({
+      #validate(need(values$col1, ''))
+      df1 <-
+        values$col1 %>% filter(Nutrition.Name == 'Sugar') %>% select(Value)
+      if (nrow(df1) > 0) {
+        valueBox(
+          paste(df1$Value, 'gm'),
+          'Sugar',
+          icon = icon('stroopwafel'),
+          color = 'lime',
+          width = NULL
+        )
+      }
+      else{
+        valueBox(
+          'Add Recipe',
+          'Sugar',
+          icon = icon('cookie'),
+          color = 'lime',
+          width = NULL
+        )
+      }
     })
   })
   
   
-  output$calories <- renderValueBox ({
-    validate(need(values$col1, ''))
-    dat <-
-      values$col1 %>% filter(Nutrition.Name == 'Energy') %>% select(Value)
-    if (nrow(dat) > 0) {
-      valueBox(
-        paste0(dat$Value, 'Kcal'),
-        'Energy',
-        icon = icon('fire'),
-        color = 'orange',
-        width = NULL
-      )
-    }
-    
-    else{
-      valueBox(
-        'Add Recipe',
-        'Energy',
-        icon = icon('fire'),
-        color = 'orange',
-        width = NULL
-      )
-    }
-    
-  })
-  output$Protein <- renderValueBox({
-    validate(need(values$col1, ''))
-    df1 <-
-      values$col1 %>% filter(Nutrition.Name == 'Protein') %>% select(Value)
-    if (nrow(df1) > 0) {
-      valueBox(
-        paste0(df1$Value, 'Grams'),
-        'Protein',
-        icon = icon('child'),
-        color = 'green',
-        width = NULL
-      )
-    }
-    else{
-      valueBox(
-        'Add Recipe',
-        'Protein',
-        icon = icon('child'),
-        color = 'green',
-        width = NULL
-      )
-    }
-  })
+  
   
 }
