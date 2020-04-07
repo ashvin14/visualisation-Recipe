@@ -1,6 +1,7 @@
 library(shiny)
 library(shinydashboard)
 source("./data/data.R")
+library(dashboardthemes)
 
 logo_personal <- shinyDashboardLogoDIY(
   
@@ -175,12 +176,10 @@ theme_purple_gradient <- shinyDashboardThemeDIY(
 # define UI logic
 ui <- dashboardPage(
   # Application title
-
   dashboardHeader(title = logo_personal),
   dashboardSidebar(
     width = 400,
     
-
     selectizeInput(
       inputId = "recipe",
       label = "Recipe",
@@ -196,7 +195,6 @@ ui <- dashboardPage(
     # actionButton("Add",
     #              "Add",
     #              icon = icon("cart-plus"))
-
     
     conditionalPanel('input.recipe != ""',
     uiOutput('quantity'),
@@ -216,35 +214,11 @@ ui <- dashboardPage(
   (valueBoxOutput('Saturated_Fat')),
   (valueBoxOutput('Sugar'))
   ),
-  dashboardBody(
-    tags$head(tags$style(HTML('{margin:5px;}'))),
-    fluidRow(width = 5, (valueBoxOutput('calories')),
-             (valueBoxOutput('Protein'))),
-    fluidPage(fluidRow(
-      uiOutput("RecipeListUI"),
-      uiOutput("groceryListUI")
-      
-    ),
-    fluidRow(uiOutput("centralPlot"))),
-    conditionalPanel(condition = 'input.Add==1',
-                     fluidRow(
-                       column(
-                         width = 5,
-                         style = 'padding-top:100px',
-                         box(
-                           title = 'Nutrition Table',
-                           solidHeader = T,
-                           collapsible = T,
-                           width = NULL,
-                           div(DT::DTOutput('table2'))
-                         )
-                       )
-                     )),
+  fluidPage(fluidRow(
+    uiOutput("RecipeListUI"),
+    uiOutput("groceryListUI")
     
-    
-    fluidRow(uiOutput("constituents_bar_graph"))
   ),
-
   fluidRow(
     uiOutput("instructionUI"),
     uiOutput("instructionSteps")
@@ -260,7 +234,6 @@ ui <- dashboardPage(
   # 
   # )))
   # )
-  #)
-
+  )
 
 )
