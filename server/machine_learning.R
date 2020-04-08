@@ -1,0 +1,1 @@
+class(grocery_new)
