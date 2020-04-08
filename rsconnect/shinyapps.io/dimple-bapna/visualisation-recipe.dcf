@@ -1,0 +1,10 @@
+name: visualisation-recipe
+title:
+username:
+account: dimple-bapna
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 2078623
+bundleId: 2985457
+url: https://dimple-bapna.shinyapps.io/visualisation-recipe/
+when: 1586331139.0181

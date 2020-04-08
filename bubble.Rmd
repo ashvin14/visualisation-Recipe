@@ -1,0 +1,107 @@
+---
+title: "Bubble_chart"
+author: "kk"
+date: "4/7/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+
+```{r}
+
+#### Writing csv
+
+write.csv(recipe_data$ingredient_list,'C:\\Users\\kkbal\\OneDrive\\Desktop\\ingredients.csv',row.names = F,quote = F)
+
+write.csv(recipe_data$weight_per_ingr,'C:\\Users\\kkbal\\OneDrive\\Desktop\\weights.csv',row.names = F,quote = F)
+
+write.csv(recipe_data$quantity,'C:\\Users\\kkbal\\OneDrive\\Desktop\\qunatity.csv',row.names = F,quote = F)
+
+write.csv(recipe_data$unit,'C:\\Users\\kkbal\\OneDrive\\Desktop\\units.csv',row.names = F,quote = F)
+
+#### Converting Ingredients
+
+ingredients<-read.csv('C:\\Users\\kkbal\\OneDrive\\Desktop\\ingredients.csv',sep=',',col.names = seq(1,20),na.strings = c('','NA'))
+
+molten.ingredients<-melt(ingredients,id=c('X1'))
+
+molten.ingredients_final<-na.omit(molten.ingredients)
+
+molten.ingredients_final<-molten.ingredients_final[,-2]
+
+molten.ingredients_final<-molten.ingredients_final[-c(6320:6339),]
+
+
+#### Converting weights
+
+weights_per<-read.csv('C:\\Users\\kkbal\\OneDrive\\Desktop\\weights.csv',sep=',',col.names = seq(1,20),na.strings = c('','NA'))
+
+molten.weights_per<-melt(weights_per,id=c('X1'))
+
+molten.weights_final<-na.omit(molten.weights_per)
+
+molten.weights_final
+
+
+#### converting quantity
+
+quantity<-read.csv('C:\\Users\\kkbal\\OneDrive\\Desktop\\quantity.csv',sep=',',col.names = seq(1,20),na.strings = c('','NA'))
+
+molten.quantity<-melt(quantity,id=c('X1'))
+
+molten_quantity_final<-na.omit(molten.quantity)
+
+molten_quantity_final
+
+#### Converting units
+
+units<-read.csv('C:\\Users\\kkbal\\OneDrive\\Desktop\\units.csv',sep=',',col.names = seq(1,20),na.strings = c('','NA'))
+
+molten.units<-melt(units,id=c('X1'))
+
+molten.units_final<-na.omit(molten.units)
+
+molten.units_final
+
+
+#### final Bubble csv
+
+molten.weights_final$quantity<-molten_quantity_final$value
+
+molten.weights_final$units<-molten.units_final$value
+
+molten.weights_final$ingredients<-molten.ingredients_final$value
+
+final<-molten.weights_final
+
+final$weights<-molten.weights_final$value
+
+final$weights<-round(as.numeric(final$weights),2)
+
+final$quantity<-round(as.numeric(final$quantity),2)
+
+final<-replace_na(final,list(quantity=0,weights=0))
+
+write.csv(final,'C:\\Users\\kkbal\\OneDrive\\Desktop\\Ingredients_bubble.csv',row.names = F)
+
+
+#### Reading the final csv
+
+bubble_data<-read.csv('C:\\Users\\kkbal\\OneDrive\\Desktop\\Ingredients_bubble.csv')
+
+  
+```
+
+
+
+
