@@ -50,11 +50,11 @@ theme_purple_gradient <- shinyDashboardThemeDIY(
   ### sidebar
   ,sidebarBackColor = cssGradientThreeColors(
     direction = "down"
-    ,colorStart = "rgb(49,56,107)"
-    ,colorMiddle = "rgb(71,59,109)"
-    ,colorEnd = "rgb(78,88,149)"
+    ,colorStart = "rgb(20,97,117)"
+    ,colorMiddle = "rgb(56,161,187)"
+    ,colorEnd = "rgb(3,22,56)"
     ,colorStartPos = 0
-    ,colorMiddlePos = 70
+    ,colorMiddlePos = 50
     ,colorEndPos = 100
   )
   
@@ -129,7 +129,7 @@ theme_purple_gradient <- shinyDashboardThemeDIY(
   ,boxTitleSize = 16
   ,boxDefaultColor = "rgb(49,56,107)"
   ,boxPrimaryColor = "rgb(141,192,241)"
-  ,boxInfoColor = "rgb(20,100,160)"
+  ,boxInfoColor = "rgb(255,255,255)"
   ,boxSuccessColor = "rgb(64,186,170)"
   ,boxWarningColor = "rgb(255,217,144)"
   ,boxDangerColor = "rgb(249,144,144)"
@@ -175,13 +175,9 @@ theme_purple_gradient <- shinyDashboardThemeDIY(
 )
 # define UI logic
 ui <- dashboardPage(
-  # Application title
-  
-  dashboardHeader(title = logo_personal),
+  dashboardHeader(title = "Rapid Groceries", titleWidth = 320),
   dashboardSidebar(
-    width = 400,
-    
-    
+    width = 320,
     selectizeInput(
       inputId = "recipe",
       label = "Recipe",
@@ -193,62 +189,44 @@ ui <- dashboardPage(
         onInitialize = I('function() { this.setValue(""); }')
       )
     ),
-    tags$head(tags$style(HTML(".selectize-input {height: 300px}"))),
-    # actionButton("Add",
-    #              "Add",
-    #              icon = icon("cart-plus"))
-    
-    
     conditionalPanel('input.recipe != ""',
                      uiOutput('quantity'),
                      uiOutput("add"))
   ),
   
   dashboardBody(
-    theme_purple_gradient
+    theme_blue_gradient
+    #theme_grey_light
     ,tags$head(tags$style(HTML(
-      
-      
       '{margin:5px;}'
     ))),
-    fluidRow(width =5,(
-      valueBoxOutput('calories')),
-      (valueBoxOutput('Protein')),
-      (valueBoxOutput('Sodium')),
-      (valueBoxOutput('Fat')),
-      (valueBoxOutput('Saturated_Fat')),
-      (valueBoxOutput('Sugar'))
-    ),
     
-    fluidPage(fluidRow(
-      uiOutput("RecipeListUI"),
-      uiOutput("groceryListUI")
-      
-    ),
-    
-    fluidRow(column(width = 5,
-                    uiOutput("instructionUI"),
-                    uiOutput("instructionSteps")
-                    
-    ),column(width = 4,
-             plotly::plotlyOutput('bubble_chart')
-    )),
-    fluidRow(column(width=5,(
-      plotly::plotlyOutput('density_plot')
-    ))),
-    fluidRow(
-      uiOutput("centralPlot")
-    )
-    # conditionalPanel(condition = 'input.table2.length >0',
-    # fluidRow(column(width=5,style='padding-top:100px',box(
-    #   title='Nutrition Table',
-    #   solidHeader = T,
-    #   collapsible = T,
-    #   width=NULL,
-    #   div(DT::DTOutput('table2'))
-    # 
-    # )))
-    # )
+    fluidPage(
+      fluidRow(width = 5,
+               valueBoxOutput('calories'),
+               valueBoxOutput('Protein'),
+               valueBoxOutput('Sodium'),
+               valueBoxOutput('Fat'),
+               valueBoxOutput('Saturated_Fat'),
+               valueBoxOutput('Sugar')
+      ),
+      fluidRow(
+        column(width = 6, uiOutput("RecipeListUI")),
+        column(width = 6, plotly::plotlyOutput('bubble_chart'))
+        ),
+      fluidRow(
+        column(width =6, uiOutput("groceryListUI")),
+        column(width =6, plotly::plotlyOutput("centralPlot", height = "500px", width = "500px"))
+      ),
+      fluidRow(
+        column(width = 12,
+               uiOutput("instructionUI"),
+               uiOutput("instructionSteps"))
+      ),
+      fluidRow(width=5,(
+        uiOutput('pie_chart_choices')
+        ),
+      plotly::plotlyOutput('pie_chart'), height = "500px", width = "500px")
+    ) #end fluidPage
   )
-  
 )

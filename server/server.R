@@ -1,19 +1,8 @@
-
-
-
-
-
-
-
-
-
-
-
 library(shiny)
 source('./server/utilities.R')
 source("./data/data.R")
 library(reshape2)
-
+library(plotly)
 
 source('./server/utilities.R')
 
@@ -38,11 +27,7 @@ server <- function(input, output) {
   
   density_df<-shiny::reactiveValues()
   
-  
-  # change this
-  # grocery_df$df <- data.frame("ingredient" = character(),"Portion Size" = integer(),
-  #                             stringsAsFactors = F)
-  
+
   recipe_df$df <- data.frame("Recipes" = character(),
                              stringsAsFactors = F)
   
@@ -127,10 +112,11 @@ server <- function(input, output) {
       box(
         title = "Grocery List",
         solidHeader = T,
-        width = 6,
+        width = 12,
         collapsible = T,
-        h5(input$recipe),
-        div(DT::DTOutput("grocery_data"), style = "font-size: 70%;")
+        #h5(input$recipe),
+        DT::DTOutput("grocery_data")
+
       )
     })
     
@@ -138,7 +124,7 @@ server <- function(input, output) {
       box(
         title = "Recipes...",
         solidHeader = T,
-        width = 6,
+        width = 12,
         collapsible = T,
         div(DT::DTOutput("recipe_df"), style = "font-size: 70%;")
       )
@@ -167,16 +153,16 @@ server <- function(input, output) {
     })
     
     
-    output$centralPlot <- renderUI({
+    output$centralPlot <- renderPlotly({
       aggregation_of_ingredients <-
-        grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = sum(Weight))
+        grocery_data$df %>% group_by(Ingredients) %>% summarise(totalWeight = round(sum(Weight),2))
       print(aggregation_of_ingredients)
       trace2 <- list(
         hole = 0.9,
         type = "pie",
         labels = aggregation_of_ingredients$Ingredients,
         values = aggregation_of_ingredients$totalWeight,
-        showlegend = T
+        showlegend = F
       )
       layout <-
         list(
@@ -199,9 +185,11 @@ server <- function(input, output) {
           p,
           title = layout$title,
           xaxis = layout$xaxis,
-          yaxis = layout$yaxis
+          yaxis = layout$yaxis,
+          paper_bgcolor = 'rgba(0,0,0,0)',
+          plot_bgcolor = 'rgba(0,0,0,0)'
         )
-      box(p)
+      p
     })
     
     output$barplot <- renderUI({
@@ -226,11 +214,13 @@ server <- function(input, output) {
     }
     
     output$bubble_chart <- plotly::renderPlotly({
-      colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
+      #colors <- c('#4AC6B7', '#1972A4', '#965F8A', '#FF7070', '#C61951')
+      colors <- c('#FF5733', '#7AFF33', '#33FFF0', '#333CFF', '#FF33E9')
+      
       fig <-
         plot_ly(
           bubble_df,
-          x = ~ quantity ,
+          x = ~ quantity+1 ,
           y = ~ weights,
           type = 'scatter',
           mode = 'markers',
@@ -291,7 +281,25 @@ server <- function(input, output) {
       
     })
     
+    output$pie_chart_choices<-renderUI({
+      selectInput("InputRecipe",
+                  label = "Nutritions",
+                  choices = recipe_df$df$Recipes)
+    })
     
+    observeEvent(input$InputRecipe,{
+      pie_data<-pie_chart_table(recipe_data)
+      pie_data_output<-pie_data%>%filter(title==input$InputRecipe)
+      output$pie_chart<-plotly::renderPlotly({
+        fig <- plot_ly(pie_data_output, labels = ~variable, values = ~value, type = 'pie',domain = list(x = c(0.6, 1), y = c(0.4, 1)))
+        fig<-fig%>%add_trace(pie_data_output,labels = ~nutrition.name, values = ~quantity,type = 'pie',domain = list(x = c(0, 0.4), y = c(0.4, 1)))
+        title<-list(family="Lobster",color='rgb(128,177,221)',size=20)
+        fig<-fig%>%layout(plot_bgcolor='rgb(254, 247, 234)',font=title,showlegend=F,paper_bgcolor = 'rgba(0,0,0,0)',plot_bgcolor ='rgba(0,0,0,0)')%>%add_annotations(y=1.07, x=0.45, text=~paste(title),
+                                                                                                                                                                     showarrow=F,font=list(size=15))%>%add_annotations(x=0.04,y=0.3, text='Nutrition Per 100 grams', showarrow=F,font=list(size=14))%>%add_annotations (x=0.95,y=0.3,text='Nutrition Per Ingredients', showarrow=F,font=list(size=14))
+        fig
+      }) 
+      
+    })
   })
   
   observeEvent(input$InstructionRecipe, {
@@ -305,7 +313,8 @@ server <- function(input, output) {
           title = input$InstructionRecipe,
           width = 6,
           solidHeader = TRUE,
-          status = "success",
+          #gradientColor = "teal",
+          status = "primary",
           renderUI(for (instructions in instructions[input$InstructionRecipe]) {
             return(lapply(1:length(instructions), function(i) {
               p(paste0("Step ", i, ": ", instructions[i]))
@@ -320,7 +329,7 @@ server <- function(input, output) {
   
   output$recipe_df <- DT::renderDataTable({
     recipe_df$df
-  }, rownames = FALSE)
+  }, rownames = FALSE, options = list(pageLength = 7))
   
   output$grocery_data <-
     DT::renderDataTable(deleteButtonColumn(grocery_data$df, 'delete_button'))
@@ -336,32 +345,15 @@ server <- function(input, output) {
     grocery_data$df <- grocery_data$df[-(rowNum), ]
   })
   
-  
-  
-  
-  
-  
   df <-
     data.frame('Nutrition.Name' = character(), 'Value' = integer())
   
   observeEvent(input$Add, {
     values$number <- input$number
     for (i in recipe_df$df$Recipes) {
-      print("Dimple1.................................................")
       de <- nutri_table(recipe_data, i, values$number)
       df <- rbind(df, de)
-      print("Dimple2..............................................")
-      print(df)
     }
-    # output$table2 <- DT::renderDataTable({
-    #   #shiny::validate(need(df, ''))
-    #   df <-
-    #     df %>% group_by(Nutrition.Name) %>% summarize(Value = sum(Value))
-    #   u <- c('KJ(cal)', 'gram', 'gram', 'gram', 'mg', 'gram')
-    #   values$col1 <- data.frame(df, units = u)
-    #   print("Dimple3...............................................")
-    #   print(values$col1)
-    # })
     
     output$calories <- renderValueBox ({
       df <-
@@ -424,7 +416,7 @@ server <- function(input, output) {
         valueBox(
           paste(df1$Value, 'gm'),
           'Fat',
-          icon = icon('drumstick-bite'),
+          icon = icon('bacon'),
           color = 'yellow',
           width = NULL
         )
@@ -433,7 +425,7 @@ server <- function(input, output) {
         valueBox(
           'Add Recipe',
           'Fat',
-          icon = icon('baby'),
+          icon = icon('bacon'),
           color = 'yellow',
           width = NULL
         )

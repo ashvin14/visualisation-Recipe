@@ -62,7 +62,7 @@ deleteButtonColumn <- function(df, id, ...) {
     options = list(# Disable sorting for the delete column
       columnDefs = list(list(
         targets = 1, sortable = FALSE
-      )))
+      )), pageLength = 7)
   )
 }
 
@@ -127,4 +127,11 @@ get_nutr_per_100gm <- function(recipe_list) {
       recipe_data %>% filter(title == recipe_title) %>% select(nutr_per_100gm)
     nutr_list[recipe_title] <- fromJSON(gsub("\'", "\"", temp_df$nutr_per_100gm))
   }
+}
+
+pie_chart_table<-function(data) {
+  pie<-data%>%dplyr::select(title,Fat,Energy,Protein,Sugar,`Saturated fat`,Sodium,Energy_100,Fat_100,Proteins_100,Salt_100,`Saturated fat_100`,Sugar_100)
+  pie<-melt(pie,id=c('title','Energy_100','Fat_100','Proteins_100','Salt_100','Saturated fat_100','Sugar_100'))
+  pie<-pie%>%rename('nutrition.name'=variable,'quantity'=value)
+  pie<-melt(pie,id=c('title','nutrition.name','quantity'))
 }
