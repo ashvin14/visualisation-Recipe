@@ -86,7 +86,7 @@ get_instructions <- function(recipe_list) {
   for (recipe_title in recipe_list$Recipes) {
     temp_df <-
       recipe_data  %>% filter(title == recipe_title) %>% dplyr::select(instructions)
-      instructions_list[recipe_title] <-fromJSON(gsub("'(?![a-z]')|(?<=\\{|\\s)'", '"', temp_df$instructions[1], perl = T))
+      instructions_list[recipe_title] <-fromJSON(gsub("'(?![a-z'])|(?<=\\{|\\s)'", '"', temp_df$instructions[1], perl = T))
      
   }
   return(instructions_list)
